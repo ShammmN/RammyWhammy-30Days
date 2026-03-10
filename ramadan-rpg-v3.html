@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>30 Days of Ramadan — Road to Your Destiny</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  background:#07071a;
+  font-family:'Press Start 2P',monospace;
+  color:#fff;
+  min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+#wrap{
+  width:960px;height:640px;position:relative;
+  border:3px solid #f5c842;
+  box-shadow:0 0 50px #f5c84244,0 0 100px #7c3aed22;
+  overflow:hidden;
+}
+#scene-canvas{
+  position:absolute;top:0;left:0;
+  width:960px;height:640px;
+  image-rendering:pixelated;
+}
+/* HUD overlay */
+#hud{
+  position:absolute;top:0;left:0;right:0;z-index:10;
+  display:flex;justify-content:space-between;align-items:flex-start;
+  padding:6px 8px;pointer-events:none;
+}
+.hbox{
+  background:rgba(7,7,26,.93);border:2px solid #f5c842;
+  padding:6px 10px;font-size:6px;line-height:1.9;
+}
+.sr{display:flex;align-items:center;gap:5px;margin:1px 0;}
+.sl{width:52px;color:#f5c842;font-size:5px;}
+.bar{width:88px;height:8px;background:#0d0d22;border:1px solid #333;}
+.bf{height:100%;transition:width .4s;}
+/* day track */
+#dtrack{
+  position:absolute;top:7px;left:50%;transform:translateX(-50%);
+  display:flex;gap:2px;z-index:10;pointer-events:none;
+}
+.dd{width:12px;height:12px;border:1px solid #333;background:#0d0d22;transition:all .3s;}
+.dd.done{background:#f5c842;border-color:#f5c842;}
+.dd.cur{background:#e056fd;border-color:#e056fd;animation:blink .9s infinite;}
+.dd.fri{border-color:#22c55e;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+/* action bar */
+#abar{
+  position:absolute;bottom:0;left:0;right:0;height:60px;z-index:10;
+  background:rgba(7,7,26,.97);border-top:2px solid #f5c842;
+  display:flex;align-items:center;justify-content:center;gap:7px;padding:0 10px;
+}
+.ab{
+  background:rgba(245,200,66,.07);border:2px solid #f5c842;color:#f5c842;
+  font-family:'Press Start 2P',monospace;font-size:5px;
+  padding:5px 9px;cursor:pointer;line-height:1.8;text-align:center;min-width:54px;
+  transition:background .15s;
+}
+.ab:hover{background:rgba(245,200,66,.25);}
+.ab:disabled{opacity:.22;cursor:not-allowed;}
+.ab.g{border-color:#22c55e;color:#22c55e;background:rgba(34,197,94,.07);}
+.ab.g:hover{background:rgba(34,197,94,.25);}
+.ab.p{border-color:#e056fd;color:#e056fd;background:rgba(224,86,253,.07);animation:gp 1.5s infinite;}
+.ab.b{border-color:#3b82f6;color:#3b82f6;background:rgba(59,130,246,.07);}
+@keyframes gp{0%,100%{box-shadow:0 0 0}50%{box-shadow:0 0 10px #e056fd}}
+/* overlay */
+#ov{
+  position:absolute;inset:0;z-index:20;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(5,5,20,.75);backdrop-filter:blur(3px);
+}
+#ov.h{display:none;}
+.pan{
+  background:#0b0b26;border:3px solid #f5c842;
+  padding:22px 26px;text-align:center;
+  min-width:340px;max-width:540px;max-height:580px;overflow-y:auto;
+  box-shadow:0 0 40px #f5c84233;
+}
+.pan::-webkit-scrollbar{width:4px;}
+.pan::-webkit-scrollbar-thumb{background:#f5c842;}
+.pt{font-size:13px;color:#f5c842;margin-bottom:11px;line-height:1.6;text-shadow:0 0 12px #f5c84288;}
+.ps{font-size:6px;color:#888;line-height:2.3;margin-bottom:13px;}
+.pb{
+  display:inline-block;background:#f5c842;color:#07071a;
+  border:none;padding:9px 16px;font-family:'Press Start 2P',monospace;
+  font-size:7px;cursor:pointer;margin:4px;border-bottom:3px solid #c4a020;transition:all .1s;
+}
+.pb:hover{background:#ffe899;transform:translateY(-1px);}
+.pb.r{background:#ef4444;border-bottom-color:#991b1b;color:#fff;}
+.pb.g{background:#22c55e;border-bottom-color:#15803d;color:#fff;}
+.pb.p{background:#e056fd;border-bottom-color:#9333ea;color:#fff;}
+.pb.k{background:transparent;border:2px solid #444;color:#666;border-bottom:2px solid #333;}
+/* char create */
+.cc2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0;}
+.cco{border:2px solid #282840;padding:10px;cursor:pointer;transition:border-color .2s;font-size:6px;line-height:2;}
+.cco:hover,.cco.s{border-color:#f5c842;background:rgba(245,200,66,.07);}
+.cco .ei{font-size:22px;display:block;margin-bottom:5px;}
+.sks{display:flex;gap:8px;justify-content:center;margin:8px 0;flex-wrap:wrap;}
+.sk{width:34px;height:34px;border:3px solid #282840;cursor:pointer;transition:border-color .2s;image-rendering:pixelated;}
+.sk:hover,.sk.s{border-color:#f5c842;}
+/* shop */
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;}
+.si{background:rgba(255,255,255,.03);border:2px solid #282840;padding:8px;cursor:pointer;transition:border-color .2s;font-size:5px;line-height:2;}
+.si:hover{border-color:#f5c842;}
+.si.own{border-color:#22c55e;}
+/* story */
+.db{background:#050515;border:2px solid #333;padding:12px;margin:10px 0;font-size:6px;line-height:2.5;color:#ddd;text-align:left;}
+.cb{display:block;width:100%;background:rgba(255,255,255,.03);border:1px solid #333;color:#ccc;font-family:'Press Start 2P',monospace;font-size:6px;padding:8px 12px;cursor:pointer;margin:4px 0;text-align:left;line-height:2;transition:all .15s;}
+.cb:hover{border-color:#f5c842;color:#f5c842;background:rgba(245,200,66,.07);}
+/* challenge */
+.chbox{background:rgba(224,86,253,.1);border:2px solid #e056fd;padding:14px;margin:10px 0;font-size:6px;line-height:2.5;color:#e8b4ff;}
+/* notif */
+#notif{
+  position:absolute;top:72px;left:50%;transform:translateX(-50%);z-index:15;
+  background:rgba(7,7,26,.97);border:2px solid #22c55e;
+  padding:6px 16px;font-size:6px;color:#22c55e;
+  text-align:center;opacity:0;pointer-events:none;transition:opacity .3s;
+  max-width:460px;line-height:2;white-space:nowrap;
+}
+/* tempts */
+.tempt{position:absolute;z-index:8;font-size:26px;pointer-events:none;animation:tf 2.5s ease-in-out infinite;filter:drop-shadow(0 0 12px #ef444499);}
+@keyframes tf{0%,100%{transform:translateY(0) rotate(-7deg)}50%{transform:translateY(-16px) rotate(7deg)}}
+.rb{position:absolute;z-index:9;background:#ef4444;color:#fff;border:2px solid #7f1d1d;font-family:'Press Start 2P',monospace;font-size:5px;padding:4px 8px;cursor:pointer;pointer-events:all;animation:pr 1s infinite;}
+@keyframes pr{0%,100%{box-shadow:none}50%{box-shadow:0 0 10px #ef4444}}
+/* fate bar */
+#fate{position:absolute;right:9px;top:50%;transform:translateY(-50%);z-index:10;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.fl{font-size:4px;color:#f5c842;writing-mode:vertical-rl;letter-spacing:2px;}
+.fv{width:13px;height:130px;background:#0d0d22;border:1px solid #333;position:relative;overflow:hidden;}
+.fi{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(0deg,#f5c842,#e056fd);transition:height .5s;}
+/* ending */
+.ec{border:3px solid;padding:18px;margin:10px 0;font-size:6px;line-height:2.5;}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="scene-canvas" width="960" height="640"></canvas>
+
+  <!-- HUD -->
+  <div id="hud">
+    <div class="hbox">
+      <div style="color:#f5c842;font-size:7px;margin-bottom:4px">📿 DAY <span id="hd">1</span>/30</div>
+      <div class="sr"><span class="sl">HUNGER</span><div class="bar"><div class="bf" id="bh" style="width:5%;background:linear-gradient(90deg,#ef4444,#f97316)"></div></div></div>
+      <div class="sr"><span class="sl">ENERGY</span><div class="bar"><div class="bf" id="be" style="width:100%;background:linear-gradient(90deg,#22c55e,#16a34a)"></div></div></div>
+      <div class="sr"><span class="sl">IMAN ✨</span><div class="bar"><div class="bf" id="bi" style="width:50%;background:linear-gradient(90deg,#a855f7,#7c3aed)"></div></div></div>
+      <div class="sr"><span class="sl">WISDOM</span><div class="bar"><div class="bf" id="bw" style="width:30%;background:linear-gradient(90deg,#3b82f6,#1d4ed8)"></div></div></div>
+      <div class="sr"><span class="sl">PRESTIGE</span><div class="bar"><div class="bf" id="bp" style="width:20%;background:linear-gradient(90deg,#ec4899,#be185d)"></div></div></div>
+    </div>
+    <div id="dtrack"></div>
+    <div class="hbox" style="text-align:right">
+      <div style="font-size:8px;color:#f5c842">🪙 <span id="hc">30</span></div>
+      <div style="font-size:6px;color:#aaa;margin-top:3px" id="hph">🌅 DAWN</div>
+      <div style="font-size:5px;color:#f97316;margin-top:3px">🔥 <span id="hst">0</span> STREAK</div>
+      <div style="font-size:5px;color:#e056fd;margin-top:3px" id="htitle">🌱 SEEKER</div>
+    </div>
+  </div>
+
+  <!-- FATE -->
+  <div id="fate">
+    <div class="fl">FATE</div>
+    <div class="fv"><div class="fi" id="fi" style="height:20%"></div></div>
+    <div style="font-size:4px;color:#666;margin-top:2px" id="fp">?</div>
+  </div>
+
+  <div id="notif"></div>
+
+  <!-- ACTION BAR -->
+  <div id="abar">
+    <button class="ab" id="b-pray"  onclick="act('pray')">🤲<br>PRAY</button>
+    <button class="ab" id="b-quran" onclick="act('quran')">📖<br>QURAN</button>
+    <button class="ab" id="b-study" onclick="act('study')">🎓<br>STUDY</button>
+    <button class="ab" id="b-trade" onclick="act('trade')">🛒<br>TRADE</button>
+    <button class="ab" id="b-rest"  onclick="act('rest')">😴<br>REST</button>
+    <button class="ab g" id="b-next"  onclick="nextPhase()">⏭️<br>NEXT</button>
+    <button class="ab p" id="b-iftar"   onclick="showIftar()"   style="display:none">🌙<br>IFTAR!</button>
+    <button class="ab p" id="b-suhoor"  onclick="showSuhoor()"  style="display:none">⭐<br>SUHOOR<br>FEST</button>
+    <button class="ab b" id="b-story"   onclick="triggerStory()" style="display:none">💬<br>EVENT!</button>
+    <button class="ab p" id="b-quest"   onclick="showQuest()"   style="display:none">⚡<br>QUEST!</button>
+  </div>
+
+  <div id="ov" class="h"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  CANVAS SETUP  — one big 960×640 canvas, we draw everything
+// ═══════════════════════════════════════════════════════════
+const CV = document.getElementById('scene-canvas');
+const CX = CV.getContext('2d');
+CX.imageSmoothingEnabled = false;
+
+// We'll use an offscreen canvas for crisp pixel art upscaling
+// Logical size: 320×213 pixels, rendered at 3× = 960×640
+const LW = 320, LH = 213, SCALE = 3;
+const OFF = document.createElement('canvas');
+OFF.width = LW; OFF.height = LH;
+const OX = OFF.getContext('2d');
+OX.imageSmoothingEnabled = false;
+
+function flushCanvas() {
+  CX.clearRect(0,0,960,640);
+  CX.drawImage(OFF, 0, 0, LW, LH, 0, 0, 960, 640);
+}
+
+// ─── pixel helpers ───────────────────────────────────────
+function px(x,y,w,h,c){ OX.fillStyle=c; OX.fillRect(x,y,w,h); }
+function dot(x,y,c){ OX.fillStyle=c; OX.fillRect(x,y,1,1); }
+function circle(cx,cy,r,c){
+  if(typeof r==='string'){ c=r; r=1; } // legacy 3-arg call
+  OX.fillStyle=c;
+  for(let y=-r;y<=r;y++) for(let x=-r;x<=r;x++)
+    if(x*x+y*y<=r*r) OX.fillRect(cx+x,cy+y,1,1);
+}
+function ellipseP(cx,cy,rx,ry,c){
+  OX.fillStyle=c;
+  for(let y=-ry;y<=ry;y++) for(let x=-rx;x<=rx;x++)
+    if((x*x)/(rx*rx)+(y*y)/(ry*ry)<=1) OX.fillRect(cx+x,cy+y,1,1);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SKY & BACKGROUND
+// ═══════════════════════════════════════════════════════════
+const PHASES = ['dawn','morning','noon','afternoon','evening','night'];
+const PNAMES = ['🌅 DAWN','🌄 MORNING','☀️ NOON','🌤 AFTERNOON','🌇 MAGHRIB','🌙 NIGHT'];
+
+function drawSky(phase){
+  const palettes = {
+    dawn:      ['#100020','#3d0f5a','#8c2a6b','#e8622a','#f5a84a','#f7c96e'],
+    morning:   ['#0a1628','#143560','#1e5c9e','#3a8fd4','#7ec8e3','#c5e8f5'],
+    noon:      ['#1a6db4','#3a99d8','#6ec0e8','#aaddf5','#d8f0fd','#fefce8'],
+    afternoon: ['#0e2a54','#1e4a8c','#3278c8','#f5c842','#f5924a','#f06030'],
+    evening:   ['#100020','#3d0f5a','#7a1e78','#e0422a','#f5784a','#f5c050'],
+    night:     ['#020208','#05051a','#08082e','#0d0d40','#101048','#141452'],
+  };
+  const cols = palettes[phase] || palettes.noon;
+  // Gradient rows
+  for(let y=0;y<LH;y++){
+    const t = y/LH;
+    const seg = t*(cols.length-1);
+    const i = Math.min(Math.floor(seg), cols.length-2);
+    const f = seg-i;
+    OX.fillStyle = lerpRGB(cols[i], cols[i+1], f);
+    OX.fillRect(0, y, LW, 1);
+  }
+}
+
+function drawStars(phase){
+  if(!['night','dawn','evening'].includes(phase)) return;
+  const alpha = phase==='night'?1:0.55;
+  const stars = [
+    [12,5],[28,12],[48,4],[72,18],[95,7],[118,22],[140,9],[165,4],
+    [185,19],[205,8],[228,14],[250,6],[270,20],[290,11],[308,5],
+    [20,28],[55,35],[88,27],[120,40],[155,30],[190,44],[225,33],[260,28],[295,38],
+    [8,50],[40,58],[75,46],[110,62],[148,52],[183,66],[218,54],[255,68],[292,56],
+  ];
+  OX.fillStyle='#ffffff';
+  stars.forEach(([sx,sy])=>{
+    const bright = 0.4+Math.random()*0.6;
+    OX.globalAlpha = alpha*bright;
+    OX.fillRect(sx,sy,1,1);
+    if(bright>0.7) OX.fillRect(sx+1,sy,1,1);
+  });
+  OX.globalAlpha=1;
+}
+
+function drawMoon(phase){
+  if(!['night','dawn','evening'].includes(phase)) return;
+  const mx=258, my=18;
+  // Outer glow
+  OX.globalAlpha=0.12; circle(mx,my,14,'#ffd700'); OX.globalAlpha=1;
+  OX.globalAlpha=0.25; circle(mx,my,10,'#ffd700'); OX.globalAlpha=1;
+  // Moon body
+  circle(mx,my,8,'#ffe066');
+  circle(mx+4,my-2,6, phase==='night'?'#08082e':phase==='dawn'?'#3d0f5a':'#3d0f5a');
+  // Crescent detail — surface texture
+  OX.globalAlpha=0.3;
+  dot(mx-2,my+2,'#fff8cc'); dot(mx-3,my,'#fff8cc'); dot(mx-1,my-2,'#fff8cc');
+  OX.globalAlpha=1;
+  // Star next to crescent
+  const sx=mx+10, sy=my-7;
+  dot(sx,sy,'#ffd700'); dot(sx+1,sy,'#ffd700'); dot(sx,sy+1,'#ffd700');
+  dot(sx-1,sy,'#ffd700'); dot(sx,sy-1,'#ffd700');
+}
+
+function drawSun(phase){
+  if(!['morning','noon','afternoon'].includes(phase)) return;
+  const sx = phase==='morning'?28:(phase==='noon'?160:292);
+  const sy = phase==='noon'?14:24;
+  const sc = phase==='noon'?'#fff9c4':'#ffd700';
+  // Outer glow
+  OX.globalAlpha=0.12; circle(sx,sy,22,sc); OX.globalAlpha=1;
+  OX.globalAlpha=0.25; circle(sx,sy,15,sc); OX.globalAlpha=1;
+  // Rays — 8 directions
+  const rayC = phase==='afternoon'?'#f5a040':'#ffe566';
+  OX.fillStyle=rayC;
+  for(let a=0;a<8;a++){
+    const ang=a*Math.PI/4;
+    for(let r=12;r<20;r++){
+      OX.fillRect(Math.round(sx+Math.cos(ang)*r), Math.round(sy+Math.sin(ang)*r), 1, 1);
+    }
+  }
+  // Diagonal rays slightly different
+  for(let a=0;a<4;a++){
+    const ang=a*Math.PI/2+Math.PI/8;
+    for(let r=11;r<16;r++){
+      OX.fillRect(Math.round(sx+Math.cos(ang)*r), Math.round(sy+Math.sin(ang)*r), 1, 1);
+    }
+  }
+  // Core
+  circle(sx,sy,8,'#ffd700');
+  circle(sx,sy,5,'#fff0a0');
+  circle(sx,sy,2,'#ffffff');
+}
+
+function drawClouds(phase){
+  if(['night'].includes(phase)) return;
+  const alpha = phase==='evening'?0.4:0.75;
+  OX.globalAlpha=alpha;
+  const clouds = [[30,28],[95,20],[175,32],[240,22]];
+  clouds.forEach(([cx,cy])=>{
+    // Each cloud is several overlapping circles
+    OX.fillStyle='#dff0f8';
+    circle(cx,cy,6,'#dff0f8'); circle(cx+7,cy-3,7,'#e8f5fc');
+    circle(cx+14,cy,6,'#dff0f8'); circle(cx+21,cy,5,'#dff0f8');
+    circle(cx+4,cy+3,5,'#d0ebf5'); circle(cx+16,cy+3,5,'#d0ebf5');
+    // Underside shading
+    OX.fillStyle='#b8d8ea';
+    OX.fillRect(cx-2,cy+4,28,2);
+  });
+  OX.globalAlpha=1;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  GROUND & ENVIRONMENT
+// ═══════════════════════════════════════════════════════════
+function drawGround(phase){
+  const isNight=['night','evening'].includes(phase);
+  const g1=isNight?'#0f2508':'#2d6b1c', g2=isNight?'#0a1a05':'#3a8526';
+  const g3=isNight?'#07120a':'#1e4a10';
+  // Ground base
+  px(0,128,LW,85,g1);
+  // Ground texture — alternating pixel rows
+  for(let y=128;y<148;y++) for(let x=0;x<LW;x+=4){
+    dot(x+(y%2)*2, y, (y%4<2)?g2:g1);
+  }
+  // Path (lighter sandy strip)
+  const pathC=isNight?'#5c4820':'#c4a254';
+  px(92,130,136,78,pathC);
+  // Path texture
+  for(let y=130;y<208;y++) for(let x=92;x<228;x+=6){
+    dot(x+(y%3), y, isNight?'#503c18':'#b89040');
+  }
+  // Path edges
+  px(90,130,3,78,'#8b7040'); px(226,130,3,78,'#8b7040');
+  // Grass tufts
+  const tufts=[[10,128],[22,129],[70,128],[78,130],[235,128],[248,130],[275,129],[295,128]];
+  tufts.forEach(([tx,ty])=>{
+    OX.fillStyle=isNight?'#14350a':'#3a9020';
+    for(let i=0;i<3;i++) OX.fillRect(tx+i,ty-i,1,i+1);
+    for(let i=0;i<2;i++) OX.fillRect(tx+i+4,ty-i,1,i+1);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MOSQUE — detailed pixel art
+// ═══════════════════════════════════════════════════════════
+function drawMosque(phase){
+  const isNight=['night','evening'].includes(phase);
+  const wallC=isNight?'#c8b890':'#e8d8b0';
+  const wall2=isNight?'#b8a878':'#d4c49a';
+  const wall3=isNight?'#a89868':'#c4b080';
+  const domeC=isNight?'#1a7040':'#22c55e';
+  const dome2=isNight?'#145830':'#16a34a';
+  const winC=isNight?'#ffd700':'#1e4a8c';
+  const winGlow=isNight?'rgba(255,200,50,0.7)':'rgba(30,74,140,0.6)';
+
+  // ── Mosque base platform ────────────────────────
+  px(56,122,208,10,wall3);
+  // Platform steps
+  px(58,120,204,4,wall2);
+  px(60,118,200,4,wallC);
+
+  // ── Main hall body ──────────────────────────────
+  px(68,68,184,54,wallC);
+  // Wall horizontal stripes
+  for(let y=72;y<122;y+=6){ px(68,y,184,1,wall2); }
+  // Wall vertical pillar lines
+  for(let x=78;x<252;x+=28){ px(x,68,2,54,wall2); }
+
+  // ── 4 arched windows ───────────────────────────
+  [[82,78],[112,78],[164,78],[194,78]].forEach(([wx,wy])=>{
+    // Window frame
+    px(wx,wy,18,28,wall3);
+    px(wx+1,wy+1,16,26,winC);
+    // Arch top
+    for(let i=0;i<18;i++){
+      const h=Math.round(Math.sqrt(Math.max(0,100-(i-8.5)**2)));
+      OX.fillStyle=wall3; OX.fillRect(wx+i,wy-h+2,1,h);
+      if(i>1&&i<16){ OX.fillStyle=winC; OX.fillRect(wx+i,wy-h+3,1,h-2); }
+    }
+    // Window glow (night = warm, day = blue)
+    OX.globalAlpha=isNight?0.6:0.35;
+    OX.fillStyle=winGlow;
+    for(let i=2;i<16;i++){
+      const h=Math.round(Math.sqrt(Math.max(0,100-(i-8.5)**2)));
+      OX.fillRect(wx+i,wy-h+4,1,h-3);
+    }
+    OX.fillRect(wx+2,wy+1,14,24);
+    OX.globalAlpha=1;
+    // Window cross dividers
+    px(wx+8,wy,2,28,wallC); px(wx,wy+13,18,2,wallC);
+    // Window frame highlight
+    OX.fillStyle='#ffffff'; OX.globalAlpha=0.15;
+    OX.fillRect(wx+2,wy+2,4,10); OX.globalAlpha=1;
+  });
+
+  // ── Grand arched door ──────────────────────────
+  const dx=149,dy=90;
+  px(dx,dy,22,32,wall3);
+  // Door arch
+  for(let i=0;i<22;i++){
+    const h=Math.round(Math.sqrt(Math.max(0,144-(i-10.5)**2)));
+    OX.fillStyle=wall3; OX.fillRect(dx+i,dy-h+3,1,h);
+  }
+  // Door fill — ornate dark wood
+  px(dx+1,dy+1,20,30,'#5c3810');
+  for(let i=1;i<22;i++){
+    const h=Math.round(Math.sqrt(Math.max(0,144-(i-10.5)**2)));
+    if(i>1&&i<21){ OX.fillStyle='#5c3810'; OX.fillRect(dx+i,dy-h+4,1,h-3); }
+  }
+  // Door panels
+  px(dx+2,dy+3,8,12,'#6e4418'); px(dx+12,dy+3,8,12,'#6e4418');
+  px(dx+2,dy+18,8,12,'#6e4418'); px(dx+12,dy+18,8,12,'#6e4418');
+  // Door knocker
+  dot(dx+10,dy+16,'#f5c842'); dot(dx+11,dy+16,'#f5c842');
+  // Door split
+  px(dx+10,dy,2,32,'#3c2408');
+  // Door arch decal
+  px(dx+3,dy,16,2,wall2);
+
+  // ── Main dome ──────────────────────────────────
+  const dmx=160,dmy=68;
+  // Dome shadow
+  OX.globalAlpha=0.2; circle(dmx+3,dmy,32,'#000'); OX.globalAlpha=1;
+  // Dome body — ellipse
+  for(let y=-36;y<=0;y++) for(let x=-34;x<=34;x++){
+    if((x*x)/(34*34)+(y*y)/(36*36)<=1){
+      const t=Math.abs(x)/34;
+      const shade=Math.floor(t*30);
+      OX.fillStyle=`rgb(${Math.max(0,34-shade)},${Math.max(0,197-shade)},${Math.max(0,94-shade)})`;
+      OX.fillRect(dmx+x,dmy+y,1,1);
+    }
+  }
+  // Dome ribs
+  OX.fillStyle=dome2;
+  for(let r=-3;r<=3;r++){
+    const bx=dmx+r*10;
+    for(let y=-34;y<=0;y++){
+      const ew=Math.round(Math.sqrt(Math.max(0,34*34-(y+34-34)*(y+34-34)))*Math.abs(r)/3.5);
+      if(ew>0){ OX.fillRect(bx-1,dmy+y,2,1); }
+    }
+  }
+  // Dome base ring
+  px(dmx-34,dmy,68,4,wall3);
+  px(dmx-32,dmy+2,64,2,wall2);
+  // Dome finial pole
+  px(dmx-1,dmy-38,2,8,'#c4a254');
+  // Dome finial ball
+  circle(dmx,dmy-40,3,'#f5c842');
+  // Dome crescent
+  circle(dmx+5,dmy-44,4,'#ffd700');
+  circle(dmx+7,dmy-45,3,'#22c55e');
+  // Crescent star
+  dot(dmx+11,dmy-46,'#ffd700'); dot(dmx+12,dmy-46,'#ffd700');
+  dot(dmx+11,dmy-47,'#ffd700'); dot(dmx+11,dmy-45,'#ffd700');
+
+  // ── Two minarets ───────────────────────────────
+  [[62,22],[248,22]].forEach(([tx,ty])=>{
+    // Shaft — tapered slightly
+    for(let y=ty;y<122;y++){
+      const taper=Math.floor((y-ty)/40);
+      const ww=10-taper;
+      px(tx,y,ww,1,wallC);
+      if(y%6===0) px(tx,y,ww,1,wall2);
+    }
+    // Shaft vertical detail
+    px(tx+2,ty+10,1,88,wall2); px(tx+6,ty+10,1,88,wall2);
+    // Balconies
+    [[ty+35],[ty+65],[ty+90]].forEach(([by])=>{
+      px(tx-3,by,wid(ty,by,ty,22)+8,3,wall3);
+      px(tx-2,by-1,wid(ty,by,ty,22)+6,1,wall2);
+    });
+    // Windows on minaret
+    [[tx+1,ty+18],[tx+1,ty+48],[tx+1,ty+72]].forEach(([wx,wy])=>{
+      px(wx,wy,8,10,winC);
+      for(let i=0;i<8;i++){
+        const h=Math.round(Math.sqrt(Math.max(0,16-(i-3.5)**2)));
+        OX.fillStyle=wall3; OX.fillRect(wx+i,wy-h+1,1,h);
+        if(i>0&&i<7){ OX.fillStyle=winC; OX.fillRect(wx+i,wy-h+2,1,h-1); }
+      }
+      if(isNight){
+        OX.globalAlpha=0.5; OX.fillStyle='#ffd700';
+        OX.fillRect(wx+1,wy+1,6,8); OX.globalAlpha=1;
+      }
+    });
+    // Minaret dome
+    for(let y=-12;y<=0;y++) for(let x=-5;x<=5;x++){
+      if((x*x)/(25)+(y*y)/(144)<=1){
+        OX.fillStyle=y<-6?dome2:domeC; OX.fillRect(tx+4+x,ty+y,1,1);
+      }
+    }
+    // Minaret crescent
+    circle(tx+4,ty-14,3,'#ffd700'); circle(tx+6,ty-15,2,isNight?'#05051a':'#1a6db4');
+    dot(tx+7,ty-17,'#ffd700'); dot(tx+8,ty-16,'#ffd700'); dot(tx+8,ty-17,'#ffd700');
+    // Finial
+    px(tx+3,ty-16,2,5,'#c4a254');
+  });
+
+  // ── Night illumination on mosque ───────────────
+  if(isNight){
+    OX.globalAlpha=0.15;
+    OX.fillStyle='#ffd700';
+    OX.fillRect(68,68,184,60);
+    OX.globalAlpha=0.08;
+    circle(160,90,70,'#ffd700');
+    OX.globalAlpha=1;
+  }
+}
+function wid(tx,by,_,__){ return 10; }
+
+// ── LANTERN STRINGS ────────────────────────────────────────
+function drawLanterns(phase){
+  const isNight=['night','evening','dawn'].includes(phase);
+  // String lines
+  OX.strokeStyle='#666'; OX.lineWidth=0.5; OX.setLineDash([1,2]);
+  OX.beginPath(); OX.moveTo(0,88); OX.lineTo(LW,88); OX.stroke();
+  OX.beginPath(); OX.moveTo(0,84); OX.bezierCurveTo(80,92,160,80,240,92); OX.lineTo(LW,88); OX.stroke();
+  OX.setLineDash([]);
+
+  const lcols=['#e056fd','#f5c842','#ef4444','#22c55e','#3b82f6','#fb923c','#06b6d4'];
+  for(let lx=4;lx<LW-4;lx+=8){
+    const ly=Math.round(88+Math.sin(lx*0.1)*3);
+    const c=lcols[Math.floor(lx/8)%lcols.length];
+    // Lantern body
+    px(lx,ly,4,6,c);
+    px(lx-1,ly+1,6,4,c);
+    px(lx+1,ly-1,2,2,'#f5c842');
+    px(lx+1,ly+6,2,2,'#888');
+    // String hang
+    dot(lx+1,ly-3,'#555'); dot(lx+1,ly-2,'#555'); dot(lx+2,ly-1,'#555');
+    // Glow at night
+    if(isNight){
+      OX.globalAlpha=0.3;
+      OX.fillStyle=c;
+      OX.fillRect(lx-2,ly-1,8,10);
+      OX.globalAlpha=0.08;
+      circle(lx+2,ly+3,10,c);
+      OX.globalAlpha=1;
+    }
+  }
+}
+
+// ── PALM TREES ─────────────────────────────────────────────
+function drawPalms(phase){
+  const isNight=['night','evening'].includes(phase);
+  const trunkC=isNight?'#5c4010':'#8b6914';
+  const leafC=isNight?'#1a5010':'#2d8a20';
+  const leaf2=isNight?'#143a0c':'#1e6014';
+  const fronds=[[-12,-8],[-8,-14],[-2,-16],[4,-14],[10,-8],[6,-4],[-4,-4]];
+
+  [[14,128],[20,128],[285,128],[296,128]].forEach(([tx,ty])=>{
+    // Trunk — curved, detailed
+    for(let i=0;i<38;i++){
+      const curve=Math.floor(Math.sin(i*0.18)*2.5);
+      const w=3-(i>28?1:0);
+      px(tx+curve,ty-i,w,1,trunkC);
+      if(i%4===0) px(tx+curve-1,ty-i,w+2,1,isNight?'#3c2a08':'#6b5010');
+    }
+    // Coconuts
+    circle(tx+1,ty-36,2,'#5c3a10');
+    dot(tx+3,ty-37,'#5c3a10');
+    // Fronds — bezier curves
+    fronds.forEach(([dx,dy])=>{
+      OX.strokeStyle=leafC; OX.lineWidth=1;
+      OX.beginPath();
+      OX.moveTo(tx+1,ty-38);
+      OX.bezierCurveTo(tx+dx/2,ty-38+dy/2,tx+dx,ty-38+dy,tx+dx+dx/3,ty-32+dy);
+      OX.stroke();
+      // Frond leaflets
+      OX.fillStyle=leaf2;
+      for(let f=0;f<5;f++){
+        const t=f/5;
+        const lx=Math.round(tx+1+dx*t);
+        const ly=Math.round(ty-38+dy*t);
+        OX.fillRect(lx,ly,2,1); OX.fillRect(lx,ly+1,1,1);
+      }
+    });
+  });
+}
+
+// ── PRAYER MAT ─────────────────────────────────────────────
+function drawPrayerMat(){
+  px(128,126,44,6,'#9b1818');
+  px(130,126,40,4,'#c0392b');
+  px(130,124,40,3,'#e74c3c');
+  for(let i=0;i<8;i++) px(130+i*5,124,3,2,'#f5c842');
+  // Mat fringe
+  for(let i=0;i<10;i++) dot(130+i*4,126,'#f5c842');
+  for(let i=0;i<10;i++) dot(130+i*4+2,131,'#f5c842');
+  // Mihrab design
+  px(143,124,8,6,'#a02020');
+  for(let i=0;i<8;i++){
+    const h=Math.round(Math.sqrt(Math.max(0,16-(i-3.5)**2)));
+    dot(143+i,124-h+2,'#f5c842');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CHARACTER — 16×32 pixel sprite with walk animation
+//  Each frame is a 16-wide × 32-tall pixel grid
+//  Drawn at origin (0,0), then translated to position
+// ═══════════════════════════════════════════════════════════
+const SKINS = {
+  light:  {skin:'#f5d5b8',shad:'#d9a882',dark:'#b8845a',lip:'#d4806a'},
+  medium: {skin:'#d4956a',shad:'#b06a3a',dark:'#8c4e22',lip:'#b85840'},
+  tan:    {skin:'#c07840',shad:'#8c5220',dark:'#6a3a10',lip:'#a04828'},
+  dark:   {skin:'#8b4513',shad:'#622e08',dark:'#3e1c04',lip:'#7a2a10'},
+  deep:   {skin:'#4a2408',shad:'#2a1204',dark:'#150902',lip:'#3a1408'},
+};
+
+function getOutfit(){
+  const p=G.prestige, d=G.day, ig=G.gender==='girl';
+  if(p>80||d>25) return ig?
+    {body:'#1a0a4a',trim:'#f5c842',shoe:'#c4a254',hijab:'#1a0a4a',htrim:'#f5c842',acc:'#f5c842',leg:'#1a0a4a',emb:'#ffd700'}:
+    {body:'#1a0a4a',trim:'#f5c842',shoe:'#c4a254',kufi:'#1a0a4a',ktrim:'#f5c842',acc:'#f5c842',leg:'#0d0630',emb:'#ffd700'};
+  if(p>50||d>15) return ig?
+    {body:'#0c3320',trim:'#22c55e',shoe:'#5a3a10',hijab:'#0c3320',htrim:'#22c55e',acc:'#22c55e',leg:'#0c3320',emb:'#86efac'}:
+    {body:'#0c3320',trim:'#22c55e',shoe:'#5a3a10',kufi:'#0c3320',ktrim:'#22c55e',acc:'#22c55e',leg:'#072218',emb:'#86efac'};
+  if(p>25||d>8) return ig?
+    {body:'#7c1a6a',trim:'#f5c842',shoe:'#5a3a10',hijab:'#8e2278',htrim:'#f5c842',acc:'#f5c842',leg:'#6a1458',emb:'#fcd34d'}:
+    {body:'#1a4a7c',trim:'#f5c842',shoe:'#5a3a10',kufi:'#1a4a7c',ktrim:'#22c55e',acc:'#22c55e',leg:'#102e58',emb:'#7dd3fc'};
+  return ig?
+    {body:'#c8b890',trim:'#8c6c40',shoe:'#5a3a10',hijab:'#b8a880',htrim:'#8c6c40',acc:'#c4a254',leg:'#a89870',emb:'#d4a060'}:
+    {body:'#e8e0d0',trim:'#c4a060',shoe:'#5a3a10',kufi:'#2a6a30',ktrim:'#22c55e',acc:'#c4a254',leg:'#c0b898',emb:'#c4a254'};
+}
+
+// ── Walk animation state ────────────────────────────────
+const ANIM = {
+  frame: 0,       // 0–7 walk cycle
+  tick: 0,        // frames elapsed
+  speed: 6,       // ticks per frame
+  walking: false,
+  charX: 100,     // logical X position (walks from 100→220)
+  dir: 1,         // 1=right, -1=left
+  loopTO: null,
+};
+
+// Kick off the walk loop when game is running
+function startWalkLoop(){
+  if(ANIM.loopTO) return;
+  function loop(){
+    ANIM.tick++;
+    if(ANIM.tick >= ANIM.speed){
+      ANIM.tick = 0;
+      ANIM.frame = (ANIM.frame+1) % 8;
+      // Move character
+      ANIM.charX += ANIM.dir * 0.8;
+      if(ANIM.charX > 215){ ANIM.dir=-1; }
+      if(ANIM.charX < 105){ ANIM.dir= 1; }
+      // Redraw just the character layer
+      redrawCharOnly();
+    }
+    ANIM.loopTO = requestAnimationFrame(loop);
+  }
+  ANIM.loopTO = requestAnimationFrame(loop);
+}
+function stopWalkLoop(){
+  if(ANIM.loopTO){ cancelAnimationFrame(ANIM.loopTO); ANIM.loopTO=null; }
+}
+
+// Redraw character on top of the already-drawn background
+// We store a snapshot of the world without character
+let worldSnapshot = null;
+function saveWorldSnapshot(){
+  worldSnapshot = OX.getImageData(0,0,LW,LH);
+}
+function redrawCharOnly(){
+  if(!worldSnapshot) return;
+  OX.putImageData(worldSnapshot,0,0);
+  drawChar();
+  flushCanvas();
+}
+
+// ── Draw the character sprite ───────────────────────────
+// Sprite is 16px wide × 32px tall at logical pixel scale
+// cx,cy = bottom-center of sprite in logical coords
+function drawChar(){
+  const sk  = SKINS[G.skin]||SKINS.tan;
+  const ot  = getOutfit();
+  const ig  = G.gender==='girl';
+  const mood= G.hunger>70?'hungry':(G.iman>70?'happy':'neutral');
+  const f   = ANIM.frame;
+  const flip= ANIM.dir < 0; // mirror when walking left
+
+  const cx = Math.round(ANIM.charX);
+  const cy = 151; // ground level
+
+  // Save/restore context for flipping
+  OX.save();
+  if(flip){
+    OX.translate(cx*2, 0);
+    OX.scale(-1,1);
+  }
+
+  // ── Shadow ──────────────────────────────────────
+  OX.globalAlpha=0.3;
+  ellipseP(cx, cy+1, 7, 2, '#000');
+  OX.globalAlpha=1;
+
+  // Walk cycle offsets — feet, legs, arms, body bob
+  // 8 frames: 0=stand, 1-3=step R, 4=stand, 5-7=step L
+  const walkCycle = [
+    // [bodyBob, lLegY, rLegY, lFootX, rFootX, lArmSwing, rArmSwing]
+    [0,  0,  0,  0,  0,  0,  0],  // frame 0 — idle
+    [0,  1,  0, -1,  1,  1, -1],  // frame 1
+    [1,  3,  0, -2,  2,  2, -2],  // frame 2 — mid step R
+    [0,  1,  1, -1,  1,  1, -1],  // frame 3
+    [0,  0,  0,  0,  0,  0,  0],  // frame 4 — idle
+    [0,  0,  1,  1, -1, -1,  1],  // frame 5
+    [1,  0,  3,  2, -2, -2,  2],  // frame 6 — mid step L
+    [0,  1,  1,  1, -1, -1,  1],  // frame 7
+  ];
+  const [bob,lly,rly,lfx,rfx,las,ras] = walkCycle[f];
+
+  // ── FEET & SHOES ────────────────────────────────
+  // Left foot
+  drawShoe(OX, cx-5+lfx, cy-bob, ot.shoe, false);
+  // Right foot
+  drawShoe(OX, cx+1+rfx, cy-bob, ot.shoe, false);
+
+  // ── LEGS ────────────────────────────────────────
+  if(!ig){
+    // Thobe hides legs mostly, show peeking hems
+    px(cx-5,cy-5-bob,4,6,ot.leg);
+    px(cx+1,cy-5-bob,4,6,ot.leg);
+  }
+
+  // ── ABAYA / THOBE BODY ──────────────────────────
+  if(ig){
+    drawAbaya(OX, cx, cy, ot, bob, f);
+  } else {
+    drawThobe(OX, cx, cy, ot, bob);
+  }
+
+  // ── ARMS ────────────────────────────────────────
+  // Left arm (behind body for girl, beside for boy)
+  drawArm(OX, cx-9, cy-20-bob+las, ot, sk, ig, las, true);
+  // Right arm
+  drawArm(OX, cx+5, cy-20-bob+ras, ot, sk, ig, ras, false);
+
+  // ── NECK ────────────────────────────────────────
+  px(cx-2, cy-27-bob, 4, 4, sk.skin);
+  // Neck shading
+  dot(cx-2, cy-27-bob, sk.shad); dot(cx+1, cy-27-bob, sk.shad);
+
+  // ── HEAD ────────────────────────────────────────
+  drawHead(OX, cx, cy, bob, sk, ot, ig, mood, f);
+
+  // ── ACCESSORIES ─────────────────────────────────
+  if(G.inventory.includes('tasbih')){
+    // Tasbih swings with walk
+    const swingX = cx - 10 + Math.round(Math.sin(f*0.8)*2);
+    const swingY = cy - 22 - bob;
+    OX.strokeStyle='#8c6c20'; OX.lineWidth=0.5;
+    OX.beginPath(); OX.moveTo(swingX,swingY); OX.lineTo(swingX-3,swingY+7); OX.stroke();
+    for(let i=0;i<4;i++){
+      circle(swingX-i,swingY+i*2,'#f5c842',1);
+    }
+    circle(swingX-3,swingY+8,'#e056fd',1);
+  }
+  if(G.inventory.includes('lantern')&&(G.phase===5||G.phase===0)){
+    const lx = cx+11, ly = cy-22-bob + Math.round(Math.sin(f*0.8)*1);
+    dot(lx,   ly-4, '#888'); dot(lx,ly-3,'#888'); dot(lx,ly-2,'#888');
+    px(lx-1,  ly,   3,5, ot.acc);
+    px(lx-2,  ly+1, 5,3, ot.acc);
+    dot(lx,   ly-1, '#f5c842');
+    OX.globalAlpha=0.2; circle(lx,ly+2,6,ot.acc); OX.globalAlpha=1;
+  }
+
+  OX.restore();
+}
+
+// ── Sub-drawing helpers ─────────────────────────────────
+
+function drawShoe(ctx, x, y, shoeC, flip){
+  // Detailed shoe: toe, sole, strap
+  px(x,   y,   5, 3, shoeC);
+  px(x-1, y+1, 7, 2, shoeC);       // sole slightly wider
+  px(x,   y,   5, 1, '#2a1a08');   // toe cap
+  px(x,   y+2, 7, 1, '#1a0e04');   // sole bottom
+  dot(x+2,y+1, '#ffffff');          // shoe highlight
+}
+
+function drawAbaya(ctx, cx, cy, ot, bob, frame){
+  // Abaya: bodice tight, skirt flares from waist down
+  // Bodice (tight upper body)
+  px(cx-4, cy-26-bob, 8, 12, ot.body);
+  // Waist definition
+  px(cx-3, cy-16-bob, 6, 2, ot.trim);
+  // Skirt — flares outward going down
+  for(let dy=0; dy<14; dy++){
+    const w = 8 + Math.floor(dy*0.6);
+    const xl = cx - Math.floor(w/2);
+    ctx.fillStyle = ot.body;
+    ctx.fillRect(xl, cy-14-bob+dy, w, 1);
+    // Embroidery hem pattern near bottom
+    if(dy > 10){
+      ctx.fillStyle = ot.emb;
+      for(let ex=xl+1; ex<xl+w-1; ex+=2) ctx.fillRect(ex, cy-14-bob+dy, 1, 1);
+    }
+  }
+  // Abaya front opening line (subtle)
+  px(cx, cy-26-bob, 1, 24, ot.trim);
+  // Collar / chest detail
+  px(cx-2, cy-26-bob, 4, 2, ot.htrim||ot.trim);
+  // Embroidery on bodice
+  dot(cx-3, cy-23-bob, ot.emb); dot(cx-3, cy-21-bob, ot.emb);
+  dot(cx+2, cy-23-bob, ot.emb); dot(cx+2, cy-21-bob, ot.emb);
+  // Walk sway — skirt hem lifts slightly on step
+  const stepSway = (frame===2||frame===6)?1:0;
+  if(stepSway){
+    ctx.fillStyle = ot.body;
+    ctx.fillRect(cx-5, cy-1-bob, 3, 1); // peek of hem movement
+  }
+}
+
+function drawThobe(ctx, cx, cy, ot, bob){
+  // Thobe: straight robe with collar and button line
+  px(cx-5, cy-26-bob, 10, 26, ot.body);
+  // Collar
+  px(cx-2, cy-26-bob, 4, 3, ot.trim);
+  // Button line
+  for(let by=cy-24-bob; by<cy-10-bob; by+=3) dot(cx, by, ot.acc);
+  // Side seams
+  dot(cx-5, cy-20-bob, ot.trim); dot(cx+4, cy-20-bob, ot.trim);
+  dot(cx-5, cy-14-bob, ot.trim); dot(cx+4, cy-14-bob, ot.trim);
+  // Hem
+  px(cx-5, cy-2-bob, 10, 2, ot.trim);
+  // Embroidery on collar
+  dot(cx-3, cy-26-bob, ot.emb); dot(cx+2, cy-26-bob, ot.emb);
+}
+
+function drawArm(ctx, x, y, ot, sk, isGirl, swing, isLeft){
+  const armC = ot.body;
+  // Upper arm
+  ctx.fillStyle = armC;
+  ctx.fillRect(x, y, 3, 7);
+  // Elbow hint
+  ctx.fillStyle = sk.shad;
+  ctx.fillRect(x+(isLeft?0:2), y+6, 1, 1);
+  // Forearm (angled with swing)
+  const fax = x + Math.round(swing * 0.3);
+  ctx.fillStyle = armC;
+  ctx.fillRect(fax, y+7, 3, 5);
+  // Cuff
+  ctx.fillStyle = ot.trim;
+  ctx.fillRect(fax, y+11, 3, 1);
+  // Hand
+  ctx.fillStyle = sk.skin;
+  ctx.fillRect(fax, y+12, 3, 3);
+  // Finger outlines
+  ctx.fillStyle = sk.shad;
+  ctx.fillRect(fax, y+14, 1, 1);
+  ctx.fillRect(fax+2, y+14, 1, 1);
+}
+
+function drawHead(ctx, cx, cy, bob, sk, ot, isGirl, mood, frame){
+  // cy = ground level (151). Character is 32px tall.
+  // Head occupies rows cy-32 to cy-20 (12px tall)
+  const hy = cy - 32 - bob; // top of head
+  for(let dy=0; dy<12; dy++) for(let dx=-5; dx<=4; dx++){
+    // Oval shape
+    const ox2=(dx+0.5)/5.5, oy2=(dy-5.5)/6;
+    if(ox2*ox2+oy2*oy2<=1){
+      ctx.fillStyle = sk.skin; ctx.fillRect(cx+dx, hy+dy, 1, 1);
+    }
+  }
+  // Head shading (right side)
+  ctx.globalAlpha=0.28;
+  for(let dy=1;dy<11;dy++){ ctx.fillStyle=sk.shad; ctx.fillRect(cx+3,hy+dy,2,1); }
+  // Head shading (left)
+  for(let dy=1;dy<11;dy++){ ctx.fillStyle=sk.shad; ctx.fillRect(cx-5,hy+dy,2,1); }
+  ctx.globalAlpha=1;
+
+  // ── Ear ──────────────────────────────────────
+  dot(cx-6,hy+5, sk.shad); dot(cx-6,hy+6, sk.skin);
+  if(!isGirl){ dot(cx+5,hy+5, sk.shad); dot(cx+5,hy+6, sk.skin); }
+
+  // ── Eyebrows ─────────────────────────────────
+  const browY = hy+3;
+  ctx.fillStyle = sk.dark;
+  ctx.fillRect(cx-4, browY, 3, 1);
+  ctx.fillRect(cx+1, browY, 3, 1);
+  dot(cx-4, browY-1, sk.dark); dot(cx+3, browY-1, sk.dark);
+
+  // ── Eyes ─────────────────────────────────────
+  const eyeY = hy+5;
+  ctx.fillStyle='#f8f4f0'; ctx.fillRect(cx-5, eyeY, 4, 3);
+  ctx.fillStyle='#f8f4f0'; ctx.fillRect(cx+1, eyeY, 4, 3);
+  // Iris color based on skin tone
+  const irisC = sk.skin==='#f5d5b8'?'#4a88b0':sk.skin==='#4a2408'?'#2a1400':'#4a2c0a';
+  ctx.fillStyle=irisC;
+  ctx.fillRect(cx-4, eyeY, 2, 3);
+  ctx.fillRect(cx+2, eyeY, 2, 3);
+  // Pupil
+  ctx.fillStyle='#080206';
+  ctx.fillRect(cx-4, eyeY+1, 2, 1);
+  ctx.fillRect(cx+2, eyeY+1, 2, 1);
+  // Catchlight
+  dot(cx-3, eyeY, '#ffffff');
+  dot(cx+3, eyeY, '#ffffff');
+  // Eyelid line
+  ctx.fillStyle='#1a0a02';
+  ctx.fillRect(cx-5, eyeY, 4, 1);
+  ctx.fillRect(cx+1, eyeY, 4, 1);
+  // Girl: lashes + eyeshadow
+  if(isGirl){
+    ctx.fillStyle='#0a0402';
+    dot(cx-6,eyeY-1,'#0a0402'); dot(cx-4,eyeY-1,'#0a0402'); dot(cx-2,eyeY-1,'#0a0402');
+    dot(cx+1,eyeY-1,'#0a0402'); dot(cx+3,eyeY-1,'#0a0402'); dot(cx+5,eyeY-1,'#0a0402');
+    ctx.globalAlpha=0.25; ctx.fillStyle=ot.htrim||ot.trim;
+    ctx.fillRect(cx-5,eyeY-1,4,1); ctx.fillRect(cx+1,eyeY-1,4,1);
+    ctx.globalAlpha=1;
+    dot(cx-5,eyeY+3,'#0a0402'); dot(cx+4,eyeY+3,'#0a0402');
+  }
+
+  // ── Nose ─────────────────────────────────────
+  const noseY = hy+7;
+  dot(cx-1, noseY,   sk.shad); dot(cx,   noseY,   sk.shad);
+  dot(cx-2, noseY+1, sk.shad); dot(cx+1, noseY+1, sk.shad);
+  dot(cx-1, noseY+2, sk.shad); dot(cx+1, noseY+2, sk.shad);
+
+  // ── Mouth ────────────────────────────────────
+  const mouthY = hy+10;
+  if(mood==='happy'){
+    ctx.fillStyle=sk.lip;
+    ctx.fillRect(cx-3,mouthY,6,1);
+    dot(cx-3,mouthY+1,sk.lip); dot(cx+2,mouthY+1,sk.lip);
+    ctx.fillRect(cx-2,mouthY+1,4,1);
+    ctx.fillStyle='#fff8f0'; ctx.fillRect(cx-2,mouthY,4,1);
+  } else if(mood==='hungry'){
+    ctx.fillStyle=sk.lip;
+    ctx.fillRect(cx-2,mouthY,4,1);
+    dot(cx-2,mouthY-1,sk.lip); dot(cx+1,mouthY-1,sk.lip);
+  } else {
+    ctx.fillStyle=sk.lip;
+    ctx.fillRect(cx-2,mouthY,4,1);
+    dot(cx-3,mouthY,sk.shad); dot(cx+2,mouthY,sk.shad);
+  }
+
+  // ── Cheeks (girls) ───────────────────────────
+  if(isGirl){
+    ctx.globalAlpha=0.28;
+    ctx.fillStyle='#ff7070';
+    ctx.fillRect(cx-6,hy+8,3,2);
+    ctx.fillRect(cx+3,hy+8,3,2);
+    ctx.globalAlpha=1;
+  }
+
+  // ── HEAD COVERING ────────────────────────────
+  if(isGirl){
+    drawHijab(ctx, cx, hy, ot, frame);
+  } else {
+    drawKufi(ctx, cx, hy, ot);
+  }
+}
+
+function drawHijab(ctx, cx, hy, ot, frame){
+  const hc = ot.hijab, ht = ot.htrim;
+  // Cap — covers top + sides of head
+  for(let dy=-5; dy<8; dy++) for(let dx=-7; dx<=6; dx++){
+    const ox2=(dx+0.5)/7, oy2=(dy+2)/9;
+    if(ox2*ox2+oy2*oy2<=1.1){
+      ctx.fillStyle = hc; ctx.fillRect(cx+dx,hy+dy,1,1);
+      // Fabric weave pattern
+      if((cx+dx+hy+dy)%4===0){ ctx.fillStyle=ht; ctx.fillRect(cx+dx,hy+dy,1,1); }
+    }
+  }
+  // Face opening frame (front edge of hijab)
+  ctx.fillStyle=hc;
+  for(let dy=0; dy<10; dy++){
+    ctx.fillRect(cx-6,hy+dy,1,1); // left edge
+    ctx.fillRect(cx+5,hy+dy,1,1); // right edge (hidden by drape)
+  }
+  // Drape left — fabric falls down
+  for(let dy=6; dy<22; dy++){
+    const ww = 5 + Math.floor(dy*0.35);
+    ctx.fillStyle=hc;
+    ctx.fillRect(cx-7-Math.floor(dy*0.2), hy+dy, ww, 1);
+    if(dy%5===0){ ctx.fillStyle=ht; ctx.fillRect(cx-7-Math.floor(dy*0.2), hy+dy, ww, 1); }
+  }
+  // Drape right (narrower, wraps under chin)
+  for(let dy=5; dy<16; dy++){
+    const ww = 3+Math.floor(dy*0.2);
+    ctx.fillStyle=hc;
+    ctx.fillRect(cx+4, hy+dy, ww, 1);
+    if(dy%5===0){ ctx.fillStyle=ht; ctx.fillRect(cx+4, hy+dy, ww, 1); }
+  }
+  // Embroidery border row
+  ctx.fillStyle=ot.emb;
+  for(let dx=-5; dx<=4; dx+=2) dot(cx+dx,hy-5,ot.emb);
+  // Hijab pin brooch
+  ctx.fillStyle=ot.acc; ctx.fillRect(cx-1,hy+7,2,2);
+  dot(cx,hy+7,'#ffffff'); // pin highlight
+  // Walk sway — slight fabric movement
+  if(frame===2||frame===6){
+    ctx.globalAlpha=0.15; ctx.fillStyle=ht;
+    ctx.fillRect(cx-9,hy+15,4,3);
+    ctx.globalAlpha=1;
+  }
+}
+
+function drawKufi(ctx, cx, hy, ot){
+  const kc=ot.kufi, kt=ot.ktrim;
+  // Kufi cap shape
+  for(let dy=-7; dy<1; dy++) for(let dx=-5; dx<=4; dx++){
+    const ox2=(dx+0.5)/5.5, oy2=(dy+3)/6;
+    if(ox2*ox2+oy2*oy2<=1.1){
+      ctx.fillStyle=kc; ctx.fillRect(cx+dx,hy+dy,1,1);
+    }
+  }
+  // Kufi band
+  ctx.fillStyle=kt; ctx.fillRect(cx-5,hy-1,10,2);
+  // Kufi pattern — vertical lines
+  ctx.globalAlpha=0.5; ctx.fillStyle=ot.emb;
+  for(let dx=-4; dx<=3; dx+=2) ctx.fillRect(cx+dx,hy-5,1,4);
+  ctx.globalAlpha=1;
+  // Band detail dots
+  for(let dx=-4; dx<=3; dx+=2) dot(cx+dx,hy, kt==='#f5c842'?'#c4a020':ot.emb);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  FULL SCENE RENDER
+// ═══════════════════════════════════════════════════════════
+function renderScene(){
+  OX.clearRect(0,0,LW,LH);
+  const ph = PHASES[G.phase];
+  drawSky(ph);
+  drawStars(ph);
+  drawMoon(ph);
+  drawSun(ph);
+  drawClouds(ph);
+  drawGround(ph);
+  drawMosque(ph);
+  drawPalms(ph);
+  drawLanterns(ph);
+  drawPrayerMat();
+  // Save world without character, then draw char on top
+  saveWorldSnapshot();
+  drawChar();
+  flushCanvas();
+}
+
+// ─── color lerp ──────────────────────────────────────────
+function lerpRGB(a,b,t){
+  const p=c=>{const h=c.replace('#','');return[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];};
+  const [ar,ag,ab]=p(a);const[br,bg,bb]=p(b);
+  return `rgb(${Math.round(ar+(br-ar)*t)},${Math.round(ag+(bg-ag)*t)},${Math.round(ab+(bb-ab)*t)})`;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  GAME STATE
+// ═══════════════════════════════════════════════════════════
+const G={
+  day:1,phase:0,hunger:5,energy:100,iman:50,wisdom:30,prestige:20,
+  coins:30,streak:0,gender:'girl',skin:'tan',
+  inventory:[],completedDays:[],completedChallenges:[],
+  prayCount:0,studyCount:0,tradeCount:0,temptResisted:0,
+  choiceLog:[],actUsed:{},activeChallenge:null,challengeDone:false,
+  challengeProgress:{},pendingStory:null,
+};
+
+const TITLES=[
+  {name:'🌱 SEEKER',   r:d=>d.day<6},
+  {name:'📿 BELIEVER', r:d=>d.iman>50&&d.day>=6},
+  {name:'🎓 SCHOLAR',  r:d=>d.wisdom>60&&d.day>=11},
+  {name:'🛒 MERCHANT', r:d=>d.coins>200&&d.day>=11},
+  {name:'🕌 HAFIZ',    r:d=>d.prayCount>60},
+  {name:'⚔️ GUARDIAN', r:d=>d.temptResisted>20},
+  {name:'👑 EMPRESS',  r:d=>d.prestige>85&&d.iman>85},
+  {name:'☪️ SAINT',    r:d=>d.iman>90&&d.wisdom>80},
+];
+function getTitle(){for(let i=TITLES.length-1;i>=0;i--)if(TITLES[i].r(G))return TITLES[i].name;return'🌱 SEEKER';}
+
+const ENDINGS=[
+  {id:'empress', title:'👑 THE EMPRESS',         col:'#f5c842', r:d=>d.prestige>80&&d.iman>75, desc:'Your faith and leadership united the people. You are crowned Empress of the believers, your name echoing through history.'},
+  {id:'saint',   title:'☪️  THE SAINT',           col:'#e056fd', r:d=>d.iman>90&&d.wisdom>75,  desc:'Your devotion transcended the world. You became a light for souls — a Saint of Ramadan, remembered forever.'},
+  {id:'scholar', title:'🎓 THE GRAND SCHOLAR',    col:'#3b82f6', r:d=>d.wisdom>80&&d.studyCount>20, desc:'Your pursuit of knowledge illuminated all. The Grand Library bears your name. Scholars recite your works forever.'},
+  {id:'merchant',title:'🛒 THE GREAT MERCHANT',   col:'#22c55e', r:d=>d.coins>400&&d.tradeCount>15, desc:'Your honest trade enriched the city. Caravans carry your legacy across the entire world.'},
+  {id:'guardian',title:'⚔️  THE GUARDIAN',        col:'#ef4444', r:d=>d.temptResisted>25&&d.iman>65, desc:'You resisted every temptation. Your strength became a shield for the weak across generations.'},
+  {id:'devoted', title:'📿 THE DEVOTED',          col:'#a855f7', r:d=>d.prayCount>80&&d.streak>25,  desc:'You completed all 30 days with perfect sincerity. A humble, pure believer. Allah sees your heart.'},
+  {id:'wander',  title:'🌙 THE WANDERER',         col:'#64748b', r:_=>true, desc:'You walked your own path. Not all who wander are lost — sometimes the journey itself is the destination.'},
+];
+
+const STORIES=[
+  {id:'s1',day:3,sp:'🧓 Elder Fatima',pt:'👵',
+   txt:'Child, a poor widow outside the mosque has no food for iftar tonight. Will you share your coins with her?',
+   ch:[
+    {t:'Give 20 coins 💰', e:()=>{G.coins-=20;G.iman+=15;G.prestige+=12;G.choiceLog.push('generous');}, r:'Her eyes filled with tears. "May Allah bless you," she wept. Your heart felt full.',  ok:()=>G.coins>=20},
+    {t:'Share some food', e:()=>{G.iman+=10;G.wisdom+=8;G.choiceLog.push('kind');},   r:'You found extra dates and bread. Small acts of kindness carry great weight with Allah.'},
+    {t:'Pray for her',    e:()=>{G.iman+=5;G.choiceLog.push('pious');},               r:'You raised your hands in dua. Sometimes our most sincere gift is our prayer.'},
+    {t:'I cannot spare anything', e:()=>{G.prestige-=5;G.choiceLog.push('selfish');}, r:'You walked past. The elder watched quietly. Some choices leave invisible marks on the soul.'},
+  ]},
+  {id:'s2',day:7,sp:'📚 The Scholar',pt:'🧔',
+   txt:'I am ill and cannot teach the orphans Quran this week. Will you take my place?',
+   ch:[
+    {t:'Yes, I will teach! 🎓',   e:()=>{G.wisdom+=20;G.prestige+=15;G.studyCount+=3;G.choiceLog.push('teacher');},    r:'The children recited verse by verse. As you taught, your own wisdom deepened beautifully.'},
+    {t:'Organize a replacement',  e:()=>{G.wisdom+=10;G.coins+=10;G.choiceLog.push('resourceful');},                    r:'You rallied other believers to help. Leadership and organization are acts of ibadah.'},
+    {t:'Send them to the masjid', e:()=>{G.iman+=5;},                                                                   r:'A simple, thoughtful solution. Not every problem requires the same approach.'},
+    {t:"I'm too exhausted",       e:()=>{G.wisdom-=5;G.choiceLog.push('avoidant');},                                    r:'You rested. Tomorrow perhaps you will find the strength. Rest can also be a mercy.'},
+  ]},
+  {id:'s3',day:12,sp:'👤 A Merchant',pt:'🧑',
+   txt:'A wealthy dealer offers you a deal involving shortcuts that may not be fully halal. Profit would be 80 coins.',
+   ch:[
+    {t:'Refuse firmly 🚫',       e:()=>{G.iman+=20;G.prestige+=15;G.choiceLog.push('principled');}, r:'Word spread of your integrity across the market. True wealth is never measured in coins alone.'},
+    {t:'Consult a scholar first 📖', e:()=>{G.wisdom+=15;G.coins+=20;G.choiceLog.push('wise');},   r:'The scholar found a halal path forward. Both wealth and conscience remained intact.'},
+    {t:'Accept the deal 💰',      e:()=>{G.coins+=80;G.iman-=20;G.choiceLog.push('compromised');}, r:'Coins filled your pouch. But in quiet moments, something felt hollow and uneasy.'},
+    {t:'Report to the community', e:()=>{G.prestige+=20;G.iman+=10;G.choiceLog.push('justice');},  r:'Others were warned and protected. You shielded the whole market from harm.'},
+  ]},
+  {id:'s4',day:18,sp:'💔 A Friend',pt:'😢',
+   txt:'Your closest friend broke their fast in secret. They are weeping with guilt and shame. How do you respond?',
+   ch:[
+    {t:'Comfort and forgive 🤗',    e:()=>{G.iman+=15;G.wisdom+=10;G.prestige+=10;G.choiceLog.push('merciful');}, r:'"Allah is Al-Ghaffar, The Forgiving," you said gently. Mercy is not weakness — it is strength.'},
+    {t:'Guide them to tawbah 📿',   e:()=>{G.iman+=20;G.wisdom+=15;G.choiceLog.push('guide');},                   r:'Together you sought forgiveness. The broken heart makes the most sincere dua.'},
+    {t:'Bring the imam to counsel', e:()=>{G.wisdom+=10;G.prestige+=5;G.choiceLog.push('structured');},            r:'The imam counseled them gently. Sometimes we all need a wiser, steadier voice.'},
+    {t:'Express your disappointment', e:()=>{G.iman+=5;G.prestige-=5;G.choiceLog.push('harsh');},                 r:'You spoke hard truths. Truth matters — but how we deliver it matters just as much.'},
+  ]},
+  {id:'s5',day:24,sp:'👑 The Council',pt:'🏛️',
+   txt:'The council of elders seeks a new district leader. Your reputation has reached them. Will you accept?',
+   ch:[
+    {t:'Accept with humility 👑', e:()=>{G.prestige+=30;G.wisdom+=15;G.choiceLog.push('leader');},      r:'You accepted for service, not power. A leader who fears Allah leads with wisdom and justice.'},
+    {t:'Nominate a wiser person', e:()=>{G.wisdom+=20;G.iman+=15;G.choiceLog.push('humble');},           r:'Your selflessness stunned the council. The one who refuses power often deserves it most.'},
+    {t:'Request time to consult', e:()=>{G.wisdom+=10;G.prestige+=10;G.choiceLog.push('measured');},     r:'You sought counsel before deciding. Patience and deliberation are the marks of great leaders.'},
+    {t:'Decline — return to prayer', e:()=>{G.iman+=20;G.prayCount+=10;G.choiceLog.push('devoted');},   r:'You returned to your prayer mat, content. Not every calling is for a throne.'},
+  ]},
+];
+
+const CHALLENGES=[
+  {id:'c1',day:3, name:'💰 ZAKAT DUTY',      desc:'Give 20 coins as Zakat. Charity purifies wealth.',          type:'donate',  cost:20,  rw:{iman:30,prestige:15,coins:10}},
+  {id:'c2',day:6, name:'📿 DHIKR MARATHON',  desc:'Complete prayers in 5 different phases today.',             type:'pray5',         rw:{iman:40,wisdom:15,coins:20}},
+  {id:'c3',day:9, name:'📖 HIFZ CHALLENGE',  desc:'Read Quran or study 4 times in one single day.',            type:'read4',         rw:{iman:35,wisdom:25,coins:15}},
+  {id:'c4',day:12,name:'😤 SABR AL-NAFS',    desc:'Resist 4 temptations without giving in.',                   type:'sabr4',         rw:{iman:50,prestige:20,coins:25}},
+  {id:'c5',day:15,name:'🌙 TAHAJJUD NIGHT',  desc:'Pray during the Night phase for Laylatul Tahajjud.',        type:'nightpray',     rw:{iman:60,wisdom:20,coins:30}},
+  {id:'c6',day:18,name:'🤝 FEED THE UMMAH',  desc:'Spend 30 energy feeding the community at iftar.',           type:'feediftar',cost:30,rw:{iman:45,prestige:30,coins:35}},
+  {id:'c7',day:21,name:'📚 KNOWLEDGE QUEST', desc:'Study 5 times AND trade 3 times in one day.',               type:'studytrade',    rw:{wisdom:40,prestige:20,coins:40}},
+  {id:'c8',day:24,name:'🔥 IRON WILL',       desc:'Complete the day with NO rest at all.',                     type:'ironwill',      rw:{iman:40,prestige:35,energy:30}},
+  {id:'c9',day:27,name:'☪️ NIGHT OF POWER',  desc:'Pray every phase AND resist every temptation today.',       type:'perfday',       rw:{iman:80,wisdom:30,prestige:40,coins:50}},
+];
+
+const FEAST=['🥘','🍲','🧆','🥙','🫕','🍮','🥜','🧁','🍯','🫔','🥗','🍛','🫙','🥐'];
+const TEMPTS=['🍔','🍕','🍟','🍩','🍦','🎂','🥤','🍫','🍭','🧋','🧃','🌮'];
+const SHOP=[
+  {id:'dates', ic:'🌴',nm:'DATES BAG',    ds:'-20% hunger per day',    cost:15,ef:'dates'},
+  {id:'water', ic:'💧',nm:'ZAMZAM JUG',   ds:'+50 energy each day',    cost:20,ef:'water'},
+  {id:'tasbih',ic:'📿',nm:'GOLD TASBIH',  ds:'+15 Iman per prayer',    cost:25,ef:'tasbih'},
+  {id:'lantern',ic:'🏮',nm:'RAMADAN LANTERN',ds:'+15 coins per trade', cost:30,ef:'lantern'},
+  {id:'book',  ic:'📚',nm:'WISDOM SCROLL',ds:'+10 Wisdom per study',   cost:22,ef:'book'},
+  {id:'crown', ic:'👑',nm:'PRESTIGE SIGIL',ds:'+10 Prestige per day',  cost:40,ef:'crown'},
+];
+
+// ═══════════════════════════════════════════════════════════
+//  CHARACTER CREATION
+// ═══════════════════════════════════════════════════════════
+let CC={gender:'girl',skin:'tan',path:'faith'};
+
+function showCharCreate(){
+  const skSwatches=[
+    {id:'light',hex:'#f5d5b8'},{id:'medium',hex:'#d4956a'},
+    {id:'tan',hex:'#c07840'},{id:'dark',hex:'#8b4513'},{id:'deep',hex:'#4a2408'},
+  ];
+  ov(`<div class="pan" style="min-width:420px">
+    <div class="pt">🌙 CREATE YOUR CHARACTER</div>
+    <div class="ps">Your choices shape your destiny across 30 holy days.</div>
+    <div style="font-size:6px;color:#f5c842;margin-bottom:7px">✦ GENDER</div>
+    <div class="cc2">
+      <div class="cco ${CC.gender==='girl'?'s':''}" id="g-girl" onclick="setCC('gender','girl')">
+        <span class="ei">👧</span><b style="color:#f5c842">GIRL</b><br>
+        <span style="color:#666">Hijab & abaya<br>+5 starting Iman</span>
+      </div>
+      <div class="cco ${CC.gender==='boy'?'s':''}" id="g-boy" onclick="setCC('gender','boy')">
+        <span class="ei">👦</span><b style="color:#f5c842">BOY</b><br>
+        <span style="color:#666">Thobe & kufi<br>+5 starting Wisdom</span>
+      </div>
+    </div>
+    <div style="font-size:6px;color:#f5c842;margin:10px 0 6px">✦ SKIN TONE</div>
+    <div class="sks">
+      ${skSwatches.map(s=>`<div class="sk ${CC.skin===s.id?'s':''}" id="sk-${s.id}" style="background:${s.hex}" onclick="setCC('skin','${s.id}')" title="${s.id}"></div>`).join('')}
+    </div>
+    <div style="font-size:6px;color:#f5c842;margin:10px 0 6px">✦ CHOOSE YOUR PATH</div>
+    <div class="cc2">
+      <div class="cco ${CC.path==='faith'?'s':''}" id="p-faith" onclick="setCC('path','faith')">
+        <span class="ei">🕌</span><b style="color:#f5c842">FAITH</b><br><span style="color:#666">+10 Iman<br>Prayer focus</span>
+      </div>
+      <div class="cco ${CC.path==='knowledge'?'s':''}" id="p-knowledge" onclick="setCC('path','knowledge')">
+        <span class="ei">📚</span><b style="color:#f5c842">KNOWLEDGE</b><br><span style="color:#666">+10 Wisdom<br>Scholar events</span>
+      </div>
+      <div class="cco ${CC.path==='trade'?'s':''}" id="p-trade" onclick="setCC('path','trade')">
+        <span class="ei">🛒</span><b style="color:#f5c842">TRADE</b><br><span style="color:#666">+20 coins<br>Merchant bonus</span>
+      </div>
+      <div class="cco ${CC.path==='prestige'?'s':''}" id="p-prestige" onclick="setCC('path','prestige')">
+        <span class="ei">👑</span><b style="color:#f5c842">PRESTIGE</b><br><span style="color:#666">+10 Prestige<br>Empress path</span>
+      </div>
+    </div>
+    <button class="pb" onclick="startGame()" style="margin-top:14px">☪️ BEGIN YOUR JOURNEY</button>
+  </div>`);
+}
+
+function setCC(k,v){
+  CC[k]=v;
+  // Refresh selection highlights
+  if(k==='gender'){
+    document.querySelectorAll('#g-girl,#g-boy').forEach(e=>e.classList.remove('s'));
+    const el=document.getElementById('g-'+v); if(el) el.classList.add('s');
+  } else if(k==='skin'){
+    document.querySelectorAll('[id^="sk-"]').forEach(e=>e.classList.remove('s'));
+    const el=document.getElementById('sk-'+v); if(el) el.classList.add('s');
+  } else if(k==='path'){
+    document.querySelectorAll('[id^="p-"]').forEach(e=>e.classList.remove('s'));
+    const el=document.getElementById('p-'+v); if(el) el.classList.add('s');
+  }
+}
+
+function startGame(){
+  G.gender=CC.gender||'girl'; G.skin=CC.skin||'tan';
+  if(CC.gender==='girl') G.iman+=5; else G.wisdom+=5;
+  const paths={faith:{iman:10},knowledge:{wisdom:10},trade:{coins:20},prestige:{prestige:10}};
+  const b=paths[CC.path||'faith'];
+  if(b){ Object.entries(b).forEach(([k,v])=>G[k]=(G[k]||0)+v); }
+  closeOv(); buildDayTrack(); renderScene(); updateHUD(); showDayPanel();
+  startWalkLoop();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  OVERLAY
+// ═══════════════════════════════════════════════════════════
+function ov(html){ const o=document.getElementById('ov'); o.innerHTML=html; o.classList.remove('h'); }
+function closeOv(){ const o=document.getElementById('ov'); o.innerHTML=''; o.classList.add('h'); }
+
+// ═══════════════════════════════════════════════════════════
+//  DAY PANEL
+// ═══════════════════════════════════════════════════════════
+function showDayPanel(){
+  clearTempts();
+  const isFri=G.day%7===5, isCh=G.day%3===0&&!G.challengeDone;
+  const st=STORIES.find(s=>s.day===G.day);
+  G.pendingStory=st||null;
+  ov(`<div class="pan">
+    <div style="font-size:22px;margin-bottom:6px">${isFri?'⭐':'📿'}</div>
+    <div class="pt">DAY ${G.day} / 30</div>
+    <div class="ps">
+      ${isFri?'🌟 FRIDAY — Suhoor Fest at dawn!<br>':''}
+      ${isCh?'⚡ A quest awaits you today!<br>':''}
+      ${st?'💬 A story event will unfold...<br>':''}
+      Fast, pray, and navigate your destiny.
+    </div>
+    <div style="font-size:6px;line-height:3;margin:10px 0;color:#aaa">
+      <span style="color:#a855f7">IMAN</span> ${bars(G.iman)} &nbsp;
+      <span style="color:#22c55e">ENERGY</span> ${bars(G.energy)}<br>
+      <span style="color:#3b82f6">WISDOM</span> ${bars(G.wisdom)} &nbsp;
+      <span style="color:#ec4899">PRESTIGE</span> ${bars(G.prestige)}
+    </div>
+    <div style="font-size:5px;color:#e056fd;margin-bottom:12px">${getTitle()}</div>
+    <button class="pb" onclick="closeOv();afterDayOpen()">☪️ BEGIN DAY ${G.day}</button>
+  </div>`);
+}
+
+function bars(v){ const f=Math.floor(v/10); return '<span style="color:#444">'+('█'.repeat(f)+'░'.repeat(10-f))+'</span> '+v+'%'; }
+
+function afterDayOpen(){
+  if(G.day%3===0&&!G.challengeDone&&!G.activeChallenge){
+    const ch=CHALLENGES.find(c=>c.day<=G.day&&!G.completedChallenges.includes(c.id));
+    if(ch){ G.activeChallenge=ch; G.challengeProgress={}; setTimeout(showQuestIntro,350); }
+  }
+  spawnTempt(); updateActBtns();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ACTIONS
+// ═══════════════════════════════════════════════════════════
+function act(a){
+  const k=a+'_'+G.phase;
+  if(G.actUsed[k]) return notify('Already done this phase!','#ef4444');
+  G.actUsed[k]=true;
+  if(a==='rest'&&G.activeChallenge?.type==='ironwill') G.challengeProgress.rested=true;
+
+  if(a==='pray'){
+    const b=G.inventory.includes('tasbih')?15:0;
+    G.iman=Math.min(100,G.iman+12+b); G.energy=Math.max(0,G.energy-5);
+    G.prayCount++; G.challengeProgress.pray=(G.challengeProgress.pray||0)+1;
+    if(G.phase===5) G.challengeProgress.nightpray=true;
+    notify(`🤲 Prayer! +${12+b} Iman${b?' (Tasbih!)':''}`, '#a855f7');
+  } else if(a==='quran'){
+    const wb=G.inventory.includes('book')?10:0;
+    G.iman=Math.min(100,G.iman+10); G.wisdom=Math.min(100,G.wisdom+6+wb);
+    G.energy=Math.max(0,G.energy-7); G.coins+=3;
+    G.challengeProgress.read=(G.challengeProgress.read||0)+1;
+    notify(`📖 Quran! +10 Iman, +${6+wb} Wisdom${wb?' (Scroll!)':''}`, '#3b82f6');
+  } else if(a==='study'){
+    const wb=G.inventory.includes('book')?10:0;
+    G.wisdom=Math.min(100,G.wisdom+15+wb); G.energy=Math.max(0,G.energy-10);
+    G.coins+=2; G.studyCount++;
+    G.challengeProgress.study=(G.challengeProgress.study||0)+1;
+    G.challengeProgress.read=(G.challengeProgress.read||0)+1;
+    notify(`🎓 Studied! +${15+wb} Wisdom${wb?' (Scroll!)':''}`, '#3b82f6');
+  } else if(a==='trade'){
+    const lb=G.inventory.includes('lantern')?15:0;
+    G.coins+=12+lb; G.prestige=Math.min(100,G.prestige+5);
+    G.energy=Math.max(0,G.energy-6); G.tradeCount++;
+    G.challengeProgress.trade=(G.challengeProgress.trade||0)+1;
+    notify(`🛒 Trade! +${12+lb} coins${lb?' (Lantern!)':''}`, '#22c55e');
+  } else if(a==='rest'){
+    G.energy=Math.min(100,G.energy+30); G.iman=Math.max(0,G.iman-2);
+    notify('😴 Rested. +30 Energy, −2 Iman', '#64748b');
+  }
+  checkQuest(); updateHUD(); renderScene();
+}
+
+function checkQuest(){
+  const ch=G.activeChallenge; if(!ch) return;
+  const p=G.challengeProgress;
+  const done=(
+    (ch.type==='pray5'&&(p.pray||0)>=5)||
+    (ch.type==='read4'&&(p.read||0)>=4)||
+    (ch.type==='sabr4'&&(p.sabr||0)>=4)||
+    (ch.type==='nightpray'&&p.nightpray)||
+    (ch.type==='studytrade'&&(p.study||0)>=5&&(p.trade||0)>=3)||
+    (ch.type==='perfday'&&(p.pray||0)>=6&&(p.sabr||0)>=3)
+  );
+  if(done) completeQuest();
+}
+
+function completeQuest(){
+  if(!G.activeChallenge) return;
+  const ch=G.activeChallenge;
+  G.completedChallenges.push(ch.id);
+  if(ch.rw.iman) G.iman=Math.min(100,G.iman+ch.rw.iman);
+  if(ch.rw.wisdom) G.wisdom=Math.min(100,G.wisdom+ch.rw.wisdom);
+  if(ch.rw.prestige) G.prestige=Math.min(100,G.prestige+ch.rw.prestige);
+  if(ch.rw.coins) G.coins+=ch.rw.coins;
+  if(ch.rw.energy) G.energy=Math.min(100,G.energy+ch.rw.energy);
+  G.activeChallenge=null; G.challengeDone=true;
+  ov(`<div class="pan">
+    <div style="font-size:24px;margin-bottom:8px">🏆✨🏆</div>
+    <div class="pt" style="color:#f5c842">QUEST COMPLETE!</div>
+    <div style="font-size:7px;color:#22c55e;line-height:3;margin:14px 0">
+      ${ch.rw.iman?`✨ +${ch.rw.iman} IMAN<br>`:''}${ch.rw.wisdom?`📚 +${ch.rw.wisdom} WISDOM<br>`:''}
+      ${ch.rw.prestige?`👑 +${ch.rw.prestige} PRESTIGE<br>`:''}${ch.rw.coins?`🪙 +${ch.rw.coins} COINS<br>`:''}
+    </div>
+    <button class="pb g" onclick="closeOv();updateHUD()">🎉 CLAIM REWARD!</button>
+  </div>`);
+  updateHUD();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PHASE
+// ═══════════════════════════════════════════════════════════
+function nextPhase(){
+  G.phase++; G.actUsed={};
+  G.hunger=Math.min(100,G.hunger+(G.phase===3?18:11));
+  G.energy=Math.max(0,G.energy-6);
+  if(G.phase>5) G.phase=5;
+  if(G.pendingStory&&G.phase===3){ setTimeout(triggerStory,300); G.pendingStory=null; }
+  if([2,4,5].includes(G.phase)) spawnTempt();
+  notify(PNAMES[G.phase],'#f5c842');
+  renderScene(); updateHUD(); updateActBtns();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TEMPTATIONS
+// ═══════════════════════════════════════════════════════════
+let temptEls=[], temptTO=null;
+function spawnTempt(){
+  if(G.hunger<20||G.phase<2) return;
+  const food=TEMPTS[Math.floor(Math.random()*TEMPTS.length)];
+  const x=90+Math.random()*620, y=160+Math.random()*90;
+  const el=document.createElement('div'); el.className='tempt';
+  el.textContent=food; el.style.left=x+'px'; el.style.top=y+'px';
+  const id='t'+Date.now(); el.id=id;
+  const rb=document.createElement('div'); rb.className='rb';
+  rb.textContent='✊ RESIST!'; rb.style.left=(x-5)+'px'; rb.style.top=(y+40)+'px';
+  rb.onclick=()=>resistTempt(id,rb);
+  document.getElementById('wrap').appendChild(el);
+  document.getElementById('wrap').appendChild(rb);
+  temptEls.push({el,rb});
+  temptTO=setTimeout(()=>{try{el.remove();}catch(e){}try{rb.remove();}catch(e){}},9000);
+}
+function resistTempt(id,rb){
+  const el=document.getElementById(id);
+  if(el)el.remove(); rb.remove();
+  G.iman=Math.min(100,G.iman+8); G.coins+=2; G.temptResisted++;
+  G.challengeProgress.sabr=(G.challengeProgress.sabr||0)+1;
+  notify('✊ SABR! +8 Iman, +2 coins','#22c55e');
+  updateHUD(); checkQuest();
+}
+function clearTempts(){
+  temptEls.forEach(({el,rb})=>{try{el.remove();}catch(e){}try{rb.remove();}catch(e){}});
+  temptEls=[]; if(temptTO) clearTimeout(temptTO);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  IFTAR
+// ═══════════════════════════════════════════════════════════
+function showIftar(){
+  clearTempts();
+  ov(`<div class="pan">
+    <div style="font-size:22px;margin-bottom:8px">🌙✨🌙</div>
+    <div class="pt">IFTAR TIME!</div>
+    <div class="ps">Alhamdulillah! Break your fast with Bismillah.<br>Day ${G.day} of 30 complete!</div>
+    <div style="font-size:26px;letter-spacing:5px;margin:12px 0">${Array.from({length:7},()=>FEAST[Math.floor(Math.random()*FEAST.length)]).join('')}</div>
+    <div style="font-size:6px;color:#22c55e;line-height:2.8;margin:10px 0">
+      🍽️ HUNGER FULLY RESET ✓<br>⚡ +50 ENERGY ✓<br>✨ +10 IMAN ✓
+      ${G.iman>70?'<br>🌟 HIGH IMAN BONUS COINS!':''}${G.streak>5?'<br>🔥 STREAK BONUS!':''}
+    </div>
+    <button class="pb p" onclick="iftarGame()">🎮 MINI-GAME: CATCH FOOD!</button><br>
+    <button class="pb" style="margin-top:8px" onclick="collectIftar(0)">⏩ SKIP TO FEAST</button>
+  </div>`);
+}
+
+function iftarGame(){
+  let score=0,alive=true;
+  ov(`<div class="pan">
+    <div class="pt" style="font-size:9px">🎮 CATCH THE IFTAR FOOD!</div>
+    <div class="ps">Click falling food! 15 seconds.</div>
+    <div id="mga" style="background:#050515;border:2px solid #333;height:90px;position:relative;overflow:hidden;margin:8px 0"></div>
+    <div style="font-size:8px;color:#f5c842;text-align:center;margin:4px 0">CAUGHT: <span id="mgs">0</span> &nbsp;|&nbsp; TIME: <span id="mgt">15</span>s</div>
+  </div>`);
+  let t=15;
+  const tim=setInterval(()=>{t--;const e=document.getElementById('mgt');if(e)e.textContent=t;if(t<=0){alive=false;clearInterval(tim);clearInterval(sp);collectIftar(score);}},1000);
+  const sp=setInterval(()=>{
+    if(!alive) return;
+    const a=document.getElementById('mga'); if(!a) return;
+    const f=document.createElement('div');
+    f.style.cssText=`position:absolute;font-size:18px;cursor:pointer;pointer-events:all;z-index:5;top:-28px;left:${Math.random()*82}%;animation:fall ${1.2+Math.random()*1.8}s linear forwards`;
+    f.textContent=FEAST[Math.floor(Math.random()*FEAST.length)];
+    f.onclick=()=>{score++;const s=document.getElementById('mgs');if(s)s.textContent=score;f.remove();};
+    a.appendChild(f); setTimeout(()=>f.remove(),3500);
+  },500);
+}
+
+function collectIftar(ms){
+  const ib=G.iman>70?20:0, sb=G.streak*3, mb=ms*5;
+  G.hunger=5; G.energy=Math.min(100,G.energy+50); G.iman=Math.min(100,G.iman+10);
+  G.prestige=Math.min(100,G.prestige+(G.inventory.includes('crown')?10:3));
+  G.coins+=20+ib+sb+mb;
+  ov(`<div class="pan">
+    <div style="font-size:22px">🎉</div>
+    <div class="pt">IFTAR FEAST!</div>
+    <div style="font-size:24px;margin:10px 0;letter-spacing:4px">${Array.from({length:9},()=>FEAST[Math.floor(Math.random()*FEAST.length)]).join('')}</div>
+    <div style="font-size:6px;color:#22c55e;line-height:2.8;margin:10px 0">
+      +20 BASE COINS${ib?`<br>+${ib} HIGH IMAN BONUS`:''}${sb?`<br>+${sb} STREAK BONUS`:''}${mb?`<br>+${mb} MINI-GAME BONUS`:''}
+    </div>
+    <button class="pb" onclick="openShop()">🛒 BAZAAR</button>
+    <button class="pb g" onclick="endDay()">➡️ NEXT DAY</button>
+  </div>`);
+  updateHUD();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SUHOOR FEST
+// ═══════════════════════════════════════════════════════════
+function showSuhoor(){
+  ov(`<div class="pan">
+    <div style="font-size:22px;margin-bottom:8px">⭐🎊⭐</div>
+    <div class="pt">SUHOOR FEST!</div>
+    <div class="ps">Friday's pre-dawn community gathering!<br>The whole neighbourhood celebrates.</div>
+    <div style="font-size:24px;margin:10px 0;letter-spacing:3px">${Array.from({length:10},()=>FEAST[Math.floor(Math.random()*FEAST.length)]).join('')}</div>
+    <div style="font-size:6px;color:#e056fd;line-height:2.8;margin:10px 0;background:rgba(224,86,253,.1);border:1px solid #e056fd;padding:10px">
+      🌟 FRIDAY BLESSINGS<br>⚡ +70 ENERGY<br>✨ +25 IMAN<br>🪙 +50 COINS<br>🔥 DOUBLE STREAK<br>👑 +10 PRESTIGE
+    </div>
+    <button class="pb p" onclick="collectSuhoor()">🎉 JOIN THE FEAST!</button>
+  </div>`);
+}
+function collectSuhoor(){
+  G.energy=Math.min(100,G.energy+70); G.iman=Math.min(100,G.iman+25);
+  G.coins+=50; G.streak+=1; G.prestige=Math.min(100,G.prestige+10);
+  notify('⭐ Suhoor Fest blessings!','#e056fd'); closeOv(); updateHUD(); renderScene();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  STORY
+// ═══════════════════════════════════════════════════════════
+function triggerStory(){
+  const st=G.pendingStory||STORIES.find(s=>s.day===G.day);
+  if(!st){notify('No event today','#64748b');return;}
+  window._CS=st; window._CC2=st.ch.filter(c=>!c.ok||c.ok());
+  ov(`<div class="pan" style="min-width:440px">
+    <div style="font-size:16px;margin-bottom:6px">${st.pt}</div>
+    <div class="pt" style="font-size:9px">${st.sp}</div>
+    <div class="db">"${st.txt}"</div>
+    <div style="margin:10px 0">${window._CC2.map((c,i)=>`<button class="cb" onclick="makeChoice(${i})">${c.t}</button>`).join('')}</div>
+  </div>`);
+}
+function makeChoice(i){
+  const c=window._CC2[i]; if(!c) return;
+  c.e(); updateHUD(); renderScene();
+  ov(`<div class="pan">
+    <div style="font-size:16px;margin-bottom:6px">${window._CS.pt}</div>
+    <div class="pt" style="font-size:9px">${window._CS.sp}</div>
+    <div class="db" style="color:#22c55e">${c.r}</div>
+    <div style="font-size:5px;color:#555;margin:10px 0;line-height:2">Your choices shape your destiny...</div>
+    <button class="pb" onclick="closeOv();updateHUD()">Continue →</button>
+  </div>`);
+  G.pendingStory=null;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  QUEST
+// ═══════════════════════════════════════════════════════════
+function showQuestIntro(){
+  const ch=G.activeChallenge; if(!ch) return;
+  ov(`<div class="pan">
+    <div style="font-size:20px;margin-bottom:8px">⚡✨⚡</div>
+    <div class="pt" style="color:#e056fd">RAMADAN QUEST!</div>
+    <div class="chbox">
+      <div style="font-size:9px;color:#e056fd;margin-bottom:8px">${ch.name}</div>
+      ${ch.desc}
+      ${ch.cost?`<br><span style="color:#ef4444">⚠️ COST: -${ch.cost} ${ch.type==='donate'?'coins':'energy'}</span>`:''}
+    </div>
+    <div style="font-size:6px;color:#22c55e;line-height:2.5;margin:10px 0">
+      REWARDS:<br>${Object.entries(ch.rw).map(([k,v])=>`${k==='iman'?'✨':k==='wisdom'?'📚':k==='prestige'?'👑':k==='coins'?'🪙':'⚡'} +${v} ${k.toUpperCase()}<br>`).join('')}
+    </div>
+    <button class="pb p" onclick="acceptQuest()">✊ ACCEPT QUEST</button>
+    <button class="pb k" onclick="declineQuest()">❌ SKIP (−10 Iman)</button>
+  </div>`);
+}
+function acceptQuest(){
+  const ch=G.activeChallenge; if(!ch) return;
+  if(ch.type==='donate'){if(G.coins<ch.cost){notify('Not enough coins!','#ef4444');return;} G.coins-=ch.cost;}
+  if(ch.type==='feediftar'){if(G.energy<ch.cost){notify('Not enough energy!','#ef4444');return;} G.energy-=ch.cost;}
+  if(ch.type==='donate'||ch.type==='feediftar'){completeQuest();return;}
+  notify('⚡ Quest accepted!','#e056fd'); closeOv(); updateHUD(); updateActBtns();
+}
+function declineQuest(){
+  G.iman=Math.max(0,G.iman-10); G.activeChallenge=null; G.challengeDone=true;
+  notify('Quest declined. −10 Iman','#64748b'); closeOv(); updateHUD();
+}
+function showQuest(){
+  const ch=G.activeChallenge; if(!ch){notify('No active quest','#64748b');return;}
+  const p=G.challengeProgress;
+  const prog={pray5:`Prayers: ${p.pray||0}/5`,read4:`Reads: ${p.read||0}/4`,sabr4:`Resisted: ${p.sabr||0}/4`,
+    nightpray:p.nightpray?'✓ Done!':'Pray during Night phase',
+    studytrade:`Study: ${p.study||0}/5  Trade: ${p.trade||0}/3`,
+    perfday:`Prayers: ${p.pray||0}/6  Resist: ${p.sabr||0}/3`,
+    ironwill:p.rested?'❌ You rested!':'✓ Still going!'}[ch.type]||'In progress...';
+  ov(`<div class="pan">
+    <div class="pt" style="color:#e056fd;font-size:9px">${ch.name}</div>
+    <div class="chbox">${ch.desc}<br><br><span style="color:#f5c842">${prog}</span></div>
+    <button class="pb" onclick="closeOv()">Keep Going!</button>
+  </div>`);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SHOP
+// ═══════════════════════════════════════════════════════════
+function openShop(){
+  ov(`<div class="pan">
+    <div class="pt" style="font-size:10px">🛒 RAMADAN BAZAAR</div>
+    <div style="font-size:7px;color:#f5c842;margin-bottom:10px">🪙 You have ${G.coins} coins</div>
+    <div class="sg">${SHOP.map(it=>`
+      <div class="si ${G.inventory.includes(it.ef)?'own':''}" onclick="buyItem('${it.ef}',${it.cost})">
+        <span style="font-size:18px;display:block;margin-bottom:4px">${it.ic}</span>
+        <b style="color:#f5c842">${it.nm}</b><br>
+        <span style="color:#888">${it.ds}</span><br>
+        <span style="color:#f5c842">🪙 ${it.cost}</span>
+        ${G.inventory.includes(it.ef)?'<br><span style="color:#22c55e">✓ OWNED</span>':''}
+      </div>`).join('')}</div>
+    <button class="pb" style="margin-top:10px" onclick="endDay()">✓ DONE SHOPPING</button>
+  </div>`);
+}
+function buyItem(ef,cost){
+  if(G.inventory.includes(ef)) return notify('Already owned!','#ef4444');
+  if(G.coins<cost) return notify('Not enough coins!','#ef4444');
+  G.coins-=cost; G.inventory.push(ef);
+  notify('✓ Purchased!','#22c55e'); updateHUD(); openShop();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  END DAY
+// ═══════════════════════════════════════════════════════════
+function endDay(){
+  // Iron will end-of-day check
+  if(G.activeChallenge?.type==='ironwill'&&!G.challengeProgress.rested) completeQuest();
+  else if(G.activeChallenge?.type==='ironwill') { G.activeChallenge=null; G.challengeDone=true; }
+
+  G.completedDays.push(G.day); G.streak++; G.day++; G.phase=0;
+  G.actUsed={}; G.challengeDone=false;
+  G.hunger=Math.max(5,G.hunger-35); G.energy=Math.min(100,G.energy+15);
+  if(G.inventory.includes('dates')) G.hunger=Math.max(5,G.hunger-20);
+  if(G.inventory.includes('water')) G.energy=Math.min(100,G.energy+50);
+  if(G.inventory.includes('lantern')) G.coins+=15;
+  if(G.inventory.includes('crown')) G.prestige=Math.min(100,G.prestige+10);
+  clearTempts(); closeOv();
+  if(G.day>30){ showEnding(); return; }
+  renderScene(); updateHUD(); buildDayTrack(); updateActBtns(); showDayPanel();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ENDING
+// ═══════════════════════════════════════════════════════════
+function showEnding(){
+  const end=ENDINGS.find(e=>e.r(G))||ENDINGS[ENDINGS.length-1];
+  const stars=G.streak>=28?3:G.streak>=20?2:1;
+  renderScene();
+  ov(`<div class="pan" style="min-width:460px">
+    <div style="font-size:18px;margin-bottom:8px">🌙☪️🌙</div>
+    <div class="pt">EID MUBARAK!</div>
+    <div class="ec" style="border-color:${end.col}">
+      <div style="font-size:16px;color:${end.col};margin-bottom:8px">${end.title}</div>
+      <div style="font-size:6px;line-height:2.5;color:#ccc">${end.desc}</div>
+    </div>
+    <div style="font-size:18px;margin:8px 0">${'⭐'.repeat(stars)+'☆'.repeat(3-stars)}</div>
+    <div style="font-size:5px;line-height:2.8;color:#888;margin:10px 0">
+      DAYS FASTED: ${G.completedDays.length}/30 &nbsp;|&nbsp; STREAK: ${G.streak}<br>
+      IMAN: ${G.iman}% &nbsp;|&nbsp; WISDOM: ${G.wisdom}%<br>
+      PRESTIGE: ${G.prestige}% &nbsp;|&nbsp; PRAYERS: ${G.prayCount}<br>
+      RESISTED: ${G.temptResisted} temptations &nbsp;|&nbsp; 🪙 ${G.coins}
+    </div>
+    <div style="font-size:22px;margin:8px 0">${Array.from({length:10},()=>FEAST[Math.floor(Math.random()*FEAST.length)]).join('')}</div>
+    <button class="pb g" onclick="location.reload()">🔄 NEW JOURNEY</button>
+  </div>`);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  HUD
+// ═══════════════════════════════════════════════════════════
+function updateHUD(){
+  document.getElementById('hd').textContent=G.day;
+  document.getElementById('hc').textContent=G.coins;
+  document.getElementById('hph').textContent=PNAMES[G.phase];
+  document.getElementById('hst').textContent=G.streak;
+  document.getElementById('htitle').textContent=getTitle();
+  const setB=(id,v)=>{ const e=document.getElementById(id); if(e) e.style.width=Math.min(100,Math.max(0,v))+'%'; };
+  setB('bh',G.hunger); setB('be',G.energy); setB('bi',G.iman); setB('bw',G.wisdom); setB('bp',G.prestige);
+  const hb=document.getElementById('bh');
+  if(hb) hb.style.background=G.hunger>70?'#ef4444':G.hunger>40?'#f97316':'#f5c842';
+  const fv=Math.round((G.iman*.3+G.wisdom*.2+G.prestige*.3+G.streak*1.5)/1.3);
+  const fi=document.getElementById('fi'); if(fi) fi.style.height=Math.min(100,fv)+'%';
+  const fp=document.getElementById('fp'); if(fp) fp.textContent=fv>70?'ROYAL':fv>50?'SCHOLAR':fv>30?'DEVOUT':'SEEKER';
+  updateActBtns(); buildDayTrack();
+}
+
+function buildDayTrack(){
+  const dt=document.getElementById('dtrack'); dt.innerHTML='';
+  for(let i=1;i<=30;i++){
+    const d=document.createElement('div');
+    let c='dd';
+    if(i%7===5) c+=' fri';
+    if(G.completedDays.includes(i)) c+=' done';
+    else if(i===G.day) c+=' cur';
+    d.className=c; d.title=`Day ${i}${i%7===5?' ⭐':''}`;
+    dt.appendChild(d);
+  }
+}
+
+function updateActBtns(){
+  const isN=G.phase===5, isD=G.phase===0, isF=G.day%7===5;
+  const sh=(id,v)=>{const e=document.getElementById(id);if(e)e.style.display=v?'block':'none';};
+  sh('b-iftar',isN); sh('b-suhoor',isD&&isF); sh('b-story',!!G.pendingStory); sh('b-quest',!!G.activeChallenge);
+  ['pray','quran','study','trade','rest'].forEach(a=>{
+    const e=document.getElementById('b-'+a);
+    if(e) e.disabled=!!G.actUsed[a+'_'+G.phase];
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  NOTIFY
+// ═══════════════════════════════════════════════════════════
+let nt=null;
+function notify(msg,col='#22c55e'){
+  const n=document.getElementById('notif');
+  n.textContent=msg; n.style.borderColor=col; n.style.color=col; n.style.opacity=1;
+  if(nt) clearTimeout(nt); nt=setTimeout(()=>n.style.opacity=0,2800);
+}
+
+// Add @keyframes fall for mini-game
+const st=document.createElement('style');
+st.textContent='@keyframes fall{from{top:-28px}to{top:96px}}';
+document.head.appendChild(st);
+
+// ═══════════════════════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════════════════════
+showCharCreate();
+</script>
+</body>
+</html>
