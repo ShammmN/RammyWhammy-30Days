@@ -1,23 +1,26 @@
-/* ... keep your previous CSS and add this ... */
-#status-bar {
-    position: absolute;
-    top: 0; width: 100%;
-    padding: 15px 30px;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-    display: flex;
-    justify-content: space-between;
-    z-index: 20;
-    font-weight: 600;
-    color: var(--gold);
-    letter-spacing: 1px;
-}
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+:root { --gold: #f5c842; --glass: rgba(15, 23, 42, 0.95); }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background: #070b14; font-family: 'Poppins', sans-serif; color: #fff; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 
-#sarah-sprite {
-    position: absolute;
-    bottom: -10px; left: 5%;
-    height: 85%; width: auto;
-    z-index: 9;
-    display: none;
-    /* This ensures the transparent background of your sprite works well */
-    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4));
-}
+#game-container { width: 1000px; height: 600px; position: relative; background: #000; border-radius: 24px; overflow: hidden; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
+
+#status-bar { position: absolute; top: 0; width: 100%; padding: 15px 30px; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); display: flex; justify-content: space-between; z-index: 20; font-weight: 600; color: var(--gold); }
+
+#scene-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: 0.8s; }
+#bg-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); transition: 0.5s; pointer-events: none; }
+
+#sarah-sprite { position: absolute; bottom: 0; left: 10%; height: 80%; z-index: 9; display: none; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); }
+
+#dialogue-container { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; background: var(--glass); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 25px; z-index: 10; display: none; }
+
+#map-ui { position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%); display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; z-index: 8; }
+
+.loc-btn { background: var(--glass); border: 1px solid rgba(245, 200, 66, 0.3); padding: 20px; border-radius: 12px; color: white; cursor: pointer; text-align: center; transition: 0.3s; width: 180px; }
+.loc-btn:hover { border-color: var(--gold); background: var(--gold); color: #000; transform: translateY(-5px); }
+
+.choice-btn { background: rgba(255,255,255,0.1); border: 1px solid var(--gold); color: white; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-right: 10px; margin-top: 10px; }
+.choice-btn:hover { background: var(--gold); color: #000; }
+
+#iftar-overlay { position: absolute; inset: 0; background: #000; z-index: 100; display: none; flex-direction: column; justify-content: center; align-items: center; }
+.iftar-title { color: var(--gold); font-size: 3rem; margin-bottom: 20px; }
