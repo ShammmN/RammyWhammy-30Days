@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sarah's 30-Day Journey</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="status-bar">
+            <span id="day-display">Day 1</span>
+            <span id="time-display">Morning</span>
+            <span id="spirit-display">Spirit: 50%</span>
+        </div>
+
+        <div id="scene-bg"></div>
+        <div id="bg-overlay"></div>
+        
+        <img id="sarah-sprite" src="https://files.fm/u/4j73c58grv" alt="Sarah">
+
+        <div id="map-ui">
+            <div class="loc-btn" onclick="goTo('house')">Home</div>
+            <div class="loc-btn" onclick="goTo('school')">High School</div>
+            <div class="loc-btn" onclick="goTo('supermarket')">Supermarket</div>
+            <div class="loc-btn" onclick="goTo('mall')">The Mall</div>
+            <div class="loc-btn" onclick="goTo('mosque')">The Mosque</div>
+            <div class="loc-btn" onclick="goTo('suhoorfest')">Suhoorfest</div>
+        </div>
+
+        <div id="dialogue-container">
+            <div id="speaker-name">Sarah</div>
+            <div id="dialogue-text"></div>
+            <div id="choices-box"></div>
+        </div>
+
+        <div id="iftar-overlay">
+            <h1 class="iftar-title">🌙 MAGHRIB</h1>
+            <p id="iftar-msg">The day is done. Time to break your fast.</p>
+            <button class="choice-btn" onclick="nextDay()">Start Next Day</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
