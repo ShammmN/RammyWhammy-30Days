@@ -3,225 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sarah's Journey: Ramadan 2026</title>
+    <title>Ramadan Sarah</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Poppins:wght@400;600&display=swap');
-        :root { --gold: #f5c842; --white: #ffffff; --bolt: #00f2ff; --pink: #ff85a2; --red: #ff4d4d; --green: #4caf50; }
+        :root { --gold: #f5c842; --bolt: #00f2ff; --green: #4caf50; }
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { background: #000; font-family: 'Poppins', sans-serif; color: #fff; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        #game-container { width: 1000px; height: 600px; position: relative; background: #111; border: 3px solid var(--gold); }
-        #scene-bg { position: absolute; inset: 0; background-size: cover; background-position: center; z-index: 1; filter: brightness(0.3); transition: 1s; }
+        body { background: #000; font-family: 'Poppins', sans-serif; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         
-        /* UI Stats */
-        #status-bar { position: absolute; top: 20px; right: -15px; padding: 10px 50px; background: var(--white); transform: rotate(2deg); z-index: 100; border: 2px solid #000; box-shadow: 4px 4px 0 var(--gold); color: #000; font-family: 'Oswald'; font-size: 1.4rem; pointer-events: none; }
-        #stats-panel { position: absolute; top: 85px; right: 20px; z-index: 100; text-align: right; font-family: 'Oswald'; pointer-events: none; }
-        .stat-row { margin-bottom: 5px; letter-spacing: 1px; font-size: 0.8rem; }
-        .bar-bg { width: 140px; height: 10px; background: rgba(255,255,255,0.1); display: inline-block; transform: skewX(-15deg); border: 1px solid #fff; overflow: hidden; vertical-align: middle; margin-left: 10px; }
-        .bar-fill { height: 100%; transition: 0.5s; }
-        #energy-bar { background: var(--bolt); }
-        #iman-bar { background: var(--gold); }
-        #grade-bar { background: var(--white); }
-        #money-bar { background: var(--green); }
-        #social-bar { background: var(--pink); }
+        #game-container { width: 1100px; height: 650px; background: #111; border: 3px solid var(--gold); position: relative; display: flex; }
+        
+        #rules-sidebar { width: 250px; background: #000; border-right: 2px solid var(--gold); padding: 20px; z-index: 20; }
+        #rules-sidebar h2 { font-family: 'Oswald'; color: var(--gold); font-size: 1.2rem; margin-bottom: 15px; border-bottom: 1px solid var(--gold); }
+        .rule-box { font-size: 0.8rem; color: #ccc; line-height: 1.4; margin-bottom: 15px; }
+        .rule-box b { color: #fff; display: block; margin-bottom: 2px; }
 
-        /* Overlay */
-        .overlay { position: absolute; inset: 0; z-index: 2000; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 40px; }
-        #math-ui { display: none; background: rgba(0,0,0,0.98); z-index: 3500; }
-        #faint-ui { display: none; background: #900; z-index: 4000; }
+        #main-game { flex-grow: 1; display: flex; flex-direction: column; position: relative; }
+        
+        #stat-bar { background: #000; display: flex; padding: 10px; border-bottom: 2px solid var(--gold); gap: 10px; }
+        .stat-item { flex: 1; font-family: 'Oswald'; font-size: 0.7rem; color: #fff; }
+        .bar-bg { width: 100%; height: 8px; background: #333; margin-top: 4px; border-radius: 4px; }
+        .bar-fill { height: 100%; transition: 0.5s; width: 50%; }
 
-        /* Map UI */
-        #map-ui { position: absolute; top: 50%; right: 5%; transform: translateY(-50%); display: none; flex-direction: column; gap: 8px; z-index: 500; }
-        .loc-btn { background: #000; color: #fff; border: 2px solid var(--gold); padding: 10px 20px; font-family: 'Oswald'; font-size: 1.1rem; cursor: pointer; text-align: left; transform: skewX(-10deg); width: 300px; }
-        .loc-btn.disabled { opacity: 0.3; pointer-events: none; }
+        #view-area { flex-grow: 1; position: relative; display: flex; align-items: center; justify-content: center; }
+        #scene-bg { position: absolute; inset: 0; background-size: cover; background-position: center; filter: brightness(0.3); z-index: 1; transition: 0.8s; }
+        
+        #game-ui { position: relative; z-index: 10; width: 400px; text-align: center; }
+        #status-text { font-family: 'Oswald'; font-size: 1.3rem; color: var(--gold); margin-bottom: 15px; text-shadow: 2px 2px #000; }
 
-        /* Dialogue */
-        #dialogue-container { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); width: 90%; background: rgba(255, 255, 255, 0.95); color: #000; padding: 30px; z-index: 600; border-bottom: 8px solid var(--gold); display: none; }
-        #speaker { font-family: 'Oswald'; font-size: 1.8rem; color: var(--gold); background: #000; padding: 5px 20px; position: absolute; top: -25px; left: 0; }
-        .action-btn { background: var(--gold); color: #000; border: none; padding: 10px 20px; font-family: 'Oswald'; font-size: 1rem; cursor: pointer; margin-right: 10px; margin-top: 15px; display: none; }
+        .btn-stack { display: flex; flex-direction: column; gap: 8px; }
+        .game-btn { background: rgba(0,0,0,0.9); color: #fff; border: 2px solid var(--gold); padding: 12px; font-family: 'Oswald'; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; width: 100%; }
+        .game-btn:hover:not(.disabled) { background: var(--gold); color: #000; }
+        .game-btn.disabled { opacity: 0.1; cursor: default; }
+
+        #dialogue-box { background: #fff; color: #000; padding: 20px; border: 4px solid var(--gold); border-radius: 4px; display: none; }
+        #diag-msg { font-weight: 600; font-size: 1rem; margin-bottom: 15px; color: #111; }
     </style>
 </head>
 <body>
-    <div id="game-container">
-        <div id="faint-ui" class="overlay">
-            <h1 style="font-family:'Oswald'; font-size:5rem;">EXHAUSTED</h1>
-            <p>You fainted. Next day starts now.</p>
-            <button class="action-btn" style="display:block;" onclick="recoverFromFaint()">WAKE UP</button>
+
+<div id="game-container">
+    <div id="rules-sidebar">
+        <h2>GAME RULES</h2>
+        <div class="rule-box"><b>⏳ 30 DAYS</b> Survive the full month of Ramadan.</div>
+        <div class="rule-box"><b>🏫 ACADEMY</b> Mandatory Mon-Fri Mornings.</div>
+        <div class="rule-box"><b>🛒 WORK</b> Mandatory Tue & Fri Afternoons.</div>
+        <div class="rule-box"><b>⚡ ENERGY</b> If Energy hits 0%, Sarah faints.</div>
+        <div class="rule-box"><b>🌙 SUHOOR</b> Choosing Suhoor at night gives an Energy boost.</div>
+    </div>
+
+    <div id="main-game">
+        <div id="stat-bar">
+            <div class="stat-item">ENERGY <div class="bar-bg"><div id="e-bar" class="bar-fill" style="background:var(--bolt)"></div></div></div>
+            <div class="stat-item">IMAN <div class="bar-bg"><div id="i-bar" class="bar-fill" style="background:var(--gold)"></div></div></div>
+            <div class="stat-item">SOCIAL <div class="bar-bg"><div id="s-bar" class="bar-fill" style="background:#a55eea"></div></div></div>
+            <div class="stat-item">GRADES <div class="bar-bg"><div id="g-bar" class="bar-fill" style="background:#fff"></div></div></div>
+            <div class="stat-item">SAVINGS <div class="bar-bg"><div id="m-bar" class="bar-fill" style="background:var(--green)"></div></div></div>
         </div>
 
-        <div id="math-ui" class="overlay">
-            <div id="timer-display" style="font-size:3rem; color:var(--red); font-family:'Oswald';">15</div>
-            <h2 style="font-family:'Oswald'; color:var(--gold);">ACADEMY POP QUIZ</h2>
-            <p id="math-question" style="font-size: 2.5rem; margin: 15px;"></p>
-            <input type="number" id="math-answer" style="background:#222; color:white; font-size:2rem; width:150px; text-align:center;">
-            <button class="action-btn" style="display:block;" onclick="checkMath()">SUBMIT</button>
-        </div>
-
-        <div id="intro-screen" class="overlay">
-            <h1 style="font-family:'Oswald'; font-size:5rem; color:var(--gold);">RAMADAN 2026</h1>
-            <p style="color: #ccc; max-width: 600px; font-size: 1.2rem;">
-                Live through the month of Ramadan as Sarah. Balance your health, faith, and grades while navigating social pressure and work.
-            </p>
-            <button class="action-btn" style="display:block; margin-top:30px;" onclick="startGame()">START JOURNEY</button>
-        </div>
-
-        <div id="status-bar"><span id="day-name">MON</span> // DAY <span id="day-num">01</span> // <span id="time-txt">MORNING</span></div>
-        <div id="stats-panel">
-            <div class="stat-row">ENERGY <div class="bar-bg"><div id="energy-bar" class="bar-fill"></div></div></div>
-            <div class="stat-row">IMAN <div class="bar-bg"><div id="iman-bar" class="bar-fill"></div></div></div>
-            <div class="stat-row">GRADES <div class="bar-bg"><div id="grade-bar" class="bar-fill"></div></div></div>
-            <div class="stat-row">SAVINGS <div class="bar-bg"><div id="money-bar" class="bar-fill"></div></div></div>
-            <div class="stat-row">SOCIAL <div class="bar-bg"><div id="social-bar" class="bar-fill"></div></div></div>
-        </div>
-
-        <div id="scene-bg"></div>
-        <div id="map-ui">
-            <button class="loc-btn" id="btn-HOME" onclick="goTo('HOME')">01 RESIDENCE</button>
-            <button class="loc-btn" id="btn-SCHOOL" onclick="goTo('SCHOOL')">02 ACADEMY</button>
-            <button class="loc-btn" id="btn-MOSQUE" onclick="goTo('MOSQUE')">03 SANCTUARY</button>
-            <button class="loc-btn" id="btn-MARKET" onclick="goTo('MARKET')">04 MARKET</button>
-            <button class="loc-btn" id="btn-MALL" onclick="goTo('MALL')">05 SHOPPING MALL</button>
-        </div>
-
-        <div id="dialogue-container">
-            <div id="speaker">SARAH</div>
-            <div id="dialogue-text"></div>
-            <div id="action-buttons">
-                <button class="action-btn" id="quiz-btn" onclick="startMath()">TAKE QUIZ</button>
-                <button class="action-btn" id="work-btn" onclick="doWork()" style="background:var(--green); color:white;">START SHIFT</button>
-                <button class="action-btn" id="opt1" onclick="socialChoice(1)"></button>
-                <button class="action-btn" id="opt2" onclick="socialChoice(2)"></button>
-                <button class="action-btn" id="next-btn" onclick="advanceTime()" style="display:inline-block; background:#333; color:#fff;">CONTINUE</button>
+        <div id="view-area">
+            <div id="scene-bg"></div>
+            <div id="game-ui">
+                <div id="status-text">DAY 01 (MON) - MORNING</div>
+                <div id="map-ui" class="btn-stack">
+                    <button class="game-btn" id="btn-HOME" onclick="goTo('HOME')">HOUSE</button>
+                    <button class="game-btn" id="btn-SCHOOL" onclick="goTo('SCHOOL')">ACADEMY</button>
+                    <button class="game-btn" id="btn-MOSQUE" onclick="goTo('MOSQUE')">MOSQUE</button>
+                    <button class="game-btn" id="btn-MARKET" onclick="goTo('MARKET')">SUPERMARKET</button>
+                </div>
+                <div id="dialogue-box">
+                    <p id="diag-msg">What will you do?</p>
+                    <div class="btn-stack" id="choices"></div>
+                </div>
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        const bgs = { HOME: "https://i.pinimg.com/1200x/45/8a/c0/458ac0146d7f8f502432ebd8a2b5203c.jpg", SCHOOL: "https://i.pinimg.com/736x/cb/93/99/cb939970e76bbe356300071a6f4f6117.jpg", MOSQUE: "https://i.pinimg.com/736x/10/23/db/1023dbabf8efd1d838455991909ec75c.jpg", MARKET: "https://i.pinimg.com/736x/4f/c8/33/4fc833a1610d8d04b1d2c7b755f18c12.jpg", MALL: "https://i.pinimg.com/736x/76/45/80/76458086d0083f3100d5562d62514e87.jpg" };
-        const week = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
-        const times = ["MORNING", "AFTERNOON", "EVENING"];
-        let state = { day: 1, dayIdx: 0, timeIdx: 0, energy: 80, iman: 50, grades: 60, money: 20, social: 50, currentMath: {ans:0}, timer: null, timeLeft: 15, loc: "", quizDone: false };
+<script>
+const imgs = {
+    HOME: "https://i.pinimg.com/1200x/ab/28/4c/ab284c12a0c9e4bd5b514458f519ec75.jpg",
+    SCHOOL: "https://i.pinimg.com/1200x/0b/91/f2/0b91f2f4370cf26f23e44efe7136195c.jpg",
+    MOSQUE: "https://i.pinimg.com/736x/10/23/db/1023dbabf8efd1d838455991909ec75c.jpg",
+    MARKET: "https://i.pinimg.com/736x/4f/c8/33/4fc833a1610d8d04b1d2c7b755f18c12.jpg"
+};
 
-        function startGame() { document.getElementById('intro-screen').style.display = 'none'; updateUI(); resetToMap(); }
+let s = { day: 1, dIdx: 0, tIdx: 0, e: 80, i: 50, soc: 50, g: 60, m: 50 };
+const week = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
+const times = ["MORNING", "AFTERNOON", "EVENING"];
 
-        function checkFaint() {
-            if (state.energy <= 0) {
-                state.energy = 30;
-                document.getElementById('faint-ui').style.display = 'flex';
-                return true;
-            }
-            return false;
-        }
+function updateUI() {
+    document.getElementById('status-text').innerText = `DAY ${s.day} (${week[s.dIdx]}) - ${times[s.tIdx]}`;
+    document.getElementById('e-bar').style.width = Math.min(100, Math.max(0, s.e)) + "%";
+    document.getElementById('i-bar').style.width = Math.min(100, s.i) + "%";
+    document.getElementById('s-bar').style.width = Math.min(100, s.soc) + "%";
+    document.getElementById('g-bar').style.width = Math.min(100, s.g) + "%";
+    document.getElementById('m-bar').style.width = Math.min(100, s.m) + "%";
 
-        function recoverFromFaint() {
-            state.timeIdx = 0; state.day++; state.dayIdx = (state.dayIdx + 1) % 7; state.quizDone = false;
-            document.getElementById('faint-ui').style.display = 'none';
-            resetToMap();
-        }
+    const isAM = s.tIdx === 0, isPM = s.tIdx === 1;
+    const isWork = (s.dIdx === 1 || s.dIdx === 4);
+    
+    ["HOME", "SCHOOL", "MOSQUE", "MARKET"].forEach(l => {
+        const b = document.getElementById(`btn-${l}`);
+        if (!b) return;
+        b.classList.remove('disabled');
+        if (s.dIdx < 5 && isAM && l !== "SCHOOL") b.classList.add('disabled');
+        if (isWork && isPM && l !== "MARKET") b.classList.add('disabled');
+    });
+}
 
-        function resetToMap() {
-            document.getElementById('map-ui').style.display = 'flex';
-            document.getElementById('dialogue-container').style.display = 'none';
-            ["HOME", "SCHOOL", "MOSQUE", "MARKET", "MALL"].forEach(loc => {
-                const btn = document.getElementById(`btn-${loc}`);
-                btn.classList.toggle('disabled', state.timeIdx === 0 && loc !== "SCHOOL");
-            });
-            updateUI();
-        }
+function goTo(loc) {
+    s.loc = loc;
+    document.getElementById('map-ui').style.display = 'none';
+    document.getElementById('dialogue-box').style.display = 'block';
+    document.getElementById('scene-bg').style.backgroundImage = `url('${imgs[loc]}')`;
+    
+    const msg = document.getElementById('diag-msg');
+    const ch = document.getElementById('choices');
+    ch.innerHTML = "";
 
-        function goTo(loc) {
-            state.loc = loc;
-            document.getElementById('scene-bg').style.backgroundImage = `url('${bgs[loc]}')`;
-            document.getElementById('map-ui').style.display = 'none';
-            document.getElementById('dialogue-container').style.display = 'block';
-            updateDialogue();
-        }
+    if (loc === "MOSQUE") {
+        msg.innerText = "The atmosphere is peaceful. How do you want to spend your time?";
+        addChoice("Pray & Recite (+15 Iman, -10 Energy)", () => { s.i += 15; s.e -= 10; next(); });
+        addChoice("Listen to a Talk (+10 Iman, -5 Energy)", () => { s.i += 10; s.e -= 5; next(); });
+    } else if (loc === "SCHOOL") {
+        msg.innerText = "Class is in session.";
+        addChoice("Study Hard (+10 Grades, -15 Energy)", () => { s.g += 10; s.e -= 15; next(); });
+        addChoice("Rest (+5 Energy)", () => { s.e += 5; next(); });
+    } else if (loc === "MARKET" && s.tIdx === 1) {
+        msg.innerText = "Time to work.";
+        addChoice("Work Hard (+$40, -30 Energy)", () => { s.m += 40; s.e -= 30; next(); });
+        addChoice("Light Duty (+$15, -10 Energy)", () => { s.m += 15; s.e -= 10; next(); });
+    } else {
+        msg.innerText = `At the ${loc}. What is your focus?`;
+        addChoice("General Activities (-15 Energy)", () => { s.e -= 15; next(); });
+        addChoice("Rest (+10 Energy)", () => { s.e += 10; next(); });
+    }
+}
 
-        function updateDialogue() {
-            const text = document.getElementById('dialogue-text');
-            const btns = ['quiz-btn', 'work-btn', 'opt1', 'opt2', 'next-btn'];
-            btns.forEach(id => document.getElementById(id).style.display = 'none');
-            
-            // Academy Friend Encounter
-            if (state.loc === 'SCHOOL' && state.timeIdx === 1) {
-                document.getElementById('speaker').innerText = "CHLOE";
-                text.innerText = "Sarah! We're skipping last period to get boba. You coming?";
-                document.getElementById('opt1').innerText = "Stay for Class (+Grades)";
-                document.getElementById('opt1').style.display = 'inline-block';
-                document.getElementById('opt2').innerText = "Go with her (+Social, -Grades)";
-                document.getElementById('opt2').style.display = 'inline-block';
-            } 
-            // Mall Friend Encounter
-            else if (state.loc === 'MALL' && state.timeIdx === 1) {
-                document.getElementById('speaker').innerText = "JAX";
-                text.innerText = "Yo Sarah, I'm hitting the arcade. Want to challenge me?";
-                document.getElementById('opt1').innerText = "Save Money (+Savings)";
-                document.getElementById('opt1').style.display = 'inline-block';
-                document.getElementById('opt2').innerText = "Play Game (-Money, +Social)";
-                document.getElementById('opt2').style.display = 'inline-block';
-            }
-            else if (state.loc === 'SCHOOL' && state.timeIdx === 0 && !state.quizDone) {
-                document.getElementById('speaker').innerText = "ACADEMY";
-                text.innerText = "Time for the morning quiz.";
-                document.getElementById('quiz-btn').style.display = 'inline-block';
-            }
-            else if (state.loc === 'MARKET' && state.timeIdx === 1 && (week[state.dayIdx] === "TUE" || week[state.dayIdx] === "THU")) {
-                document.getElementById('speaker').innerText = "BOSS";
-                text.innerText = "Clock in.";
-                document.getElementById('work-btn').style.display = 'inline-block';
-            } 
-            else {
-                document.getElementById('speaker').innerText = "SARAH";
-                text.innerText = `I'm at the ${state.loc.toLowerCase()}.`;
-                document.getElementById('next-btn').style.display = 'inline-block';
-            }
-        }
+function addChoice(t, f) {
+    const b = document.createElement('button');
+    b.className = "game-btn";
+    b.innerText = t;
+    b.onclick = f;
+    document.getElementById('choices').appendChild(b);
+}
 
-        function socialChoice(choice) {
-            if (state.loc === 'SCHOOL') {
-                if (choice === 1) { state.grades += 10; state.social -= 5; }
-                else { state.social += 15; state.grades -= 10; state.energy -= 10; }
-            } else if (state.loc === 'MALL') {
-                if (choice === 1) { state.money += 5; state.social -= 5; }
-                else { state.social += 15; state.money -= 10; state.energy -= 5; }
-            }
-            if(!checkFaint()){ updateUI(); document.getElementById('opt1').style.display = 'none'; document.getElementById('opt2').style.display = 'none'; document.getElementById('next-btn').style.display = 'inline-block'; }
-        }
+function next() {
+    if (s.tIdx < 2) {
+        s.tIdx++; 
+        document.getElementById('dialogue-box').style.display = 'none';
+        document.getElementById('map-ui').style.display = 'flex';
+        updateUI();
+    } else {
+        document.getElementById('map-ui').style.display = 'none';
+        document.getElementById('dialogue-box').style.display = 'block';
+        document.getElementById('diag-msg').innerText = "Night has fallen. Set alarm for Suhoor?";
+        const ch = document.getElementById('choices');
+        ch.innerHTML = "";
+        addChoice("Suhoor Prep (+25 Energy morning)", () => { s.e += 25; endDay(); });
+        addChoice("Sleep in (+5 Energy morning)", () => { s.e += 5; endDay(); });
+    }
+}
 
-        function startMath() {
-            let a = Math.floor(Math.random() * 9) + 4; let b = Math.floor(Math.random() * 9) + 4;
-            state.currentMath.ans = a * b;
-            document.getElementById('math-question').innerText = `${a} × ${b} = ?`;
-            document.getElementById('math-ui').style.display = 'flex';
-            state.timeLeft = 15;
-            state.timer = setInterval(() => {
-                state.timeLeft--; document.getElementById('timer-display').innerText = state.timeLeft;
-                if (state.timeLeft <= 0) { clearInterval(state.timer); timeOut(); }
-            }, 1000);
-        }
+function endDay() {
+    s.tIdx = 0; s.day++; s.dIdx = (s.dIdx + 1) % 7;
+    if (s.e <= 0) { alert("Sarah fainted! Penalty applied."); s.e = 30; s.m -= 10; s.g -= 5; }
+    document.getElementById('dialogue-box').style.display = 'none';
+    document.getElementById('map-ui').style.display = 'flex';
+    updateUI();
+}
 
-        function checkMath() { 
-            clearInterval(state.timer); 
-            let val = parseInt(document.getElementById('math-answer').value);
-            state.grades += (val === state.currentMath.ans) ? 10 : -8;
-            state.energy -= 10; state.quizDone = true;
-            document.getElementById('math-ui').style.display = 'none';
-            if (!checkFaint()) { updateUI(); updateDialogue(); }
-        }
-
-        function timeOut() { state.grades -= 12; state.energy -= 15; state.quizDone = true; document.getElementById('math-ui').style.display = 'none'; if(!checkFaint()){updateUI(); updateDialogue();} }
-        function doWork() { state.money += 25; state.energy -= 30; if(!checkFaint()){updateUI(); updateDialogue();} }
-        function advanceTime() { state.energy -= 5; if(!checkFaint()){ if (state.timeIdx < 2) state.timeIdx++; else { state.timeIdx = 0; state.day++; state.dayIdx = (state.dayIdx + 1) % 7; state.quizDone = false; } resetToMap(); }}
-
-        function updateUI() {
-            document.getElementById('day-num').innerText = state.day.toString().padStart(2, '0');
-            document.getElementById('day-name').innerText = week[state.dayIdx];
-            document.getElementById('time-txt').innerText = times[state.timeIdx];
-            document.getElementById('energy-bar').style.width = state.energy + "%";
-            document.getElementById('iman-bar').style.width = state.iman + "%";
-            document.getElementById('grade-bar').style.width = state.grades + "%";
-            document.getElementById('money-bar').style.width = state.money + "%";
-            document.getElementById('social-bar').style.width = state.social + "%";
-        }
-    </script>
+updateUI();
+</script>
 </body>
 </html>
