@@ -2,43 +2,178 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sarah's 30-Day Ramadan Journey</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ramadan Sarah</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Poppins:wght@400;600&display=swap');
+        :root { --gold: #f5c842; --bolt: #00f2ff; --green: #4caf50; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { background: #000; font-family: 'Poppins', sans-serif; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        
+        #game-container { width: 1100px; height: 650px; background: #111; border: 3px solid var(--gold); position: relative; display: flex; }
+        
+        #rules-sidebar { width: 250px; background: #000; border-right: 2px solid var(--gold); padding: 20px; z-index: 20; }
+        #rules-sidebar h2 { font-family: 'Oswald'; color: var(--gold); font-size: 1.2rem; margin-bottom: 15px; border-bottom: 1px solid var(--gold); }
+        .rule-box { font-size: 0.8rem; color: #ccc; line-height: 1.4; margin-bottom: 15px; }
+        .rule-box b { color: #fff; display: block; margin-bottom: 2px; }
+
+        #main-game { flex-grow: 1; display: flex; flex-direction: column; position: relative; }
+        
+        #stat-bar { background: #000; display: flex; padding: 10px; border-bottom: 2px solid var(--gold); gap: 10px; }
+        .stat-item { flex: 1; font-family: 'Oswald'; font-size: 0.7rem; color: #fff; }
+        .bar-bg { width: 100%; height: 8px; background: #333; margin-top: 4px; border-radius: 4px; }
+        .bar-fill { height: 100%; transition: 0.5s; width: 50%; }
+
+        #view-area { flex-grow: 1; position: relative; display: flex; align-items: center; justify-content: center; }
+        #scene-bg { position: absolute; inset: 0; background-size: cover; background-position: center; filter: brightness(0.3); z-index: 1; transition: 0.8s; }
+        
+        #game-ui { position: relative; z-index: 10; width: 400px; text-align: center; }
+        #status-text { font-family: 'Oswald'; font-size: 1.3rem; color: var(--gold); margin-bottom: 15px; text-shadow: 2px 2px #000; }
+
+        .btn-stack { display: flex; flex-direction: column; gap: 8px; }
+        .game-btn { background: rgba(0,0,0,0.9); color: #fff; border: 2px solid var(--gold); padding: 12px; font-family: 'Oswald'; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; width: 100%; }
+        .game-btn:hover:not(.disabled) { background: var(--gold); color: #000; }
+        .game-btn.disabled { opacity: 0.1; cursor: default; }
+
+        #dialogue-box { background: #fff; color: #000; padding: 20px; border: 4px solid var(--gold); border-radius: 4px; display: none; }
+        #diag-msg { font-weight: 600; font-size: 1rem; margin-bottom: 15px; color: #111; }
+    </style>
 </head>
 <body>
-    <div id="game-container">
-        <div id="status-bar">
-            <span id="day-display">Day 1</span>
-            <span id="time-display">Morning</span>
-            <span id="spirit-display">Spirit: 50%</span>
+
+<div id="game-container">
+    <div id="rules-sidebar">
+        <h2>GAME RULES</h2>
+        <div class="rule-box"><b>⏳ 30 DAYS</b> Survive the full month of Ramadan.</div>
+        <div class="rule-box"><b>🏫 ACADEMY</b> Mandatory Mon-Fri Mornings.</div>
+        <div class="rule-box"><b>🛒 WORK</b> Mandatory Tue & Fri Afternoons.</div>
+        <div class="rule-box"><b>⚡ ENERGY</b> If Energy hits 0%, Sarah faints.</div>
+        <div class="rule-box"><b>🌙 SUHOOR</b> Choosing Suhoor at night gives an Energy boost.</div>
+    </div>
+
+    <div id="main-game">
+        <div id="stat-bar">
+            <div class="stat-item">ENERGY <div class="bar-bg"><div id="e-bar" class="bar-fill" style="background:var(--bolt)"></div></div></div>
+            <div class="stat-item">IMAN <div class="bar-bg"><div id="i-bar" class="bar-fill" style="background:var(--gold)"></div></div></div>
+            <div class="stat-item">SOCIAL <div class="bar-bg"><div id="s-bar" class="bar-fill" style="background:#a55eea"></div></div></div>
+            <div class="stat-item">GRADES <div class="bar-bg"><div id="g-bar" class="bar-fill" style="background:#fff"></div></div></div>
+            <div class="stat-item">SAVINGS <div class="bar-bg"><div id="m-bar" class="bar-fill" style="background:var(--green)"></div></div></div>
         </div>
 
-        <div id="scene-bg"></div>
-        <div id="bg-overlay"></div>
-        
-        <img id="sarah-sprite" src="https://openclipart.org/image/400px/217117" alt="Sarah">
-
-        <div id="map-ui">
-            <div class="loc-btn" onclick="goTo('house')">Home</div>
-            <div class="loc-btn" onclick="goTo('school')">High School</div>
-            <div class="loc-btn" onclick="goTo('supermarket')">Supermarket</div>
-            <div class="loc-btn" onclick="goTo('mall')">The Mall</div>
-            <div class="loc-btn" onclick="goTo('mosque')">The Mosque</div>
-            <div class="loc-btn" onclick="goTo('suhoorfest')">Suhoorfest</div>
-        </div>
-
-        <div id="dialogue-container">
-            <div id="speaker-name">Sarah</div>
-            <div id="dialogue-text"></div>
-            <div id="choices-box"></div>
-        </div>
-
-        <div id="iftar-overlay">
-            <h1 class="iftar-title">🌙 MAGHRIB</h1>
-            <p id="iftar-msg">The Adhan is calling. The day is complete!</p>
-            <button class="choice-btn" onclick="nextDay()">Start Next Day</button>
+        <div id="view-area">
+            <div id="scene-bg"></div>
+            <div id="game-ui">
+                <div id="status-text">DAY 01 (MON) - MORNING</div>
+                <div id="map-ui" class="btn-stack">
+                    <button class="game-btn" id="btn-HOME" onclick="goTo('HOME')">HOUSE</button>
+                    <button class="game-btn" id="btn-SCHOOL" onclick="goTo('SCHOOL')">ACADEMY</button>
+                    <button class="game-btn" id="btn-MOSQUE" onclick="goTo('MOSQUE')">MOSQUE</button>
+                    <button class="game-btn" id="btn-MARKET" onclick="goTo('MARKET')">SUPERMARKET</button>
+                </div>
+                <div id="dialogue-box">
+                    <p id="diag-msg">What will you do?</p>
+                    <div class="btn-stack" id="choices"></div>
+                </div>
+            </div>
         </div>
     </div>
-    <script src="script.js"></script>
+</div>
+
+<script>
+const imgs = {
+    HOME: "https://i.pinimg.com/1200x/ab/28/4c/ab284c12a0c9e4bd5b514458f519ec75.jpg",
+    SCHOOL: "https://i.pinimg.com/1200x/0b/91/f2/0b91f2f4370cf26f23e44efe7136195c.jpg",
+    MOSQUE: "https://i.pinimg.com/736x/10/23/db/1023dbabf8efd1d838455991909ec75c.jpg",
+    MARKET: "https://i.pinimg.com/736x/4f/c8/33/4fc833a1610d8d04b1d2c7b755f18c12.jpg"
+};
+
+let s = { day: 1, dIdx: 0, tIdx: 0, e: 80, i: 50, soc: 50, g: 60, m: 50 };
+const week = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
+const times = ["MORNING", "AFTERNOON", "EVENING"];
+
+function updateUI() {
+    document.getElementById('status-text').innerText = `DAY ${s.day} (${week[s.dIdx]}) - ${times[s.tIdx]}`;
+    document.getElementById('e-bar').style.width = Math.min(100, Math.max(0, s.e)) + "%";
+    document.getElementById('i-bar').style.width = Math.min(100, s.i) + "%";
+    document.getElementById('s-bar').style.width = Math.min(100, s.soc) + "%";
+    document.getElementById('g-bar').style.width = Math.min(100, s.g) + "%";
+    document.getElementById('m-bar').style.width = Math.min(100, s.m) + "%";
+
+    const isAM = s.tIdx === 0, isPM = s.tIdx === 1;
+    const isWork = (s.dIdx === 1 || s.dIdx === 4);
+    
+    ["HOME", "SCHOOL", "MOSQUE", "MARKET"].forEach(l => {
+        const b = document.getElementById(`btn-${l}`);
+        if (!b) return;
+        b.classList.remove('disabled');
+        if (s.dIdx < 5 && isAM && l !== "SCHOOL") b.classList.add('disabled');
+        if (isWork && isPM && l !== "MARKET") b.classList.add('disabled');
+    });
+}
+
+function goTo(loc) {
+    s.loc = loc;
+    document.getElementById('map-ui').style.display = 'none';
+    document.getElementById('dialogue-box').style.display = 'block';
+    document.getElementById('scene-bg').style.backgroundImage = `url('${imgs[loc]}')`;
+    
+    const msg = document.getElementById('diag-msg');
+    const ch = document.getElementById('choices');
+    ch.innerHTML = "";
+
+    if (loc === "MOSQUE") {
+        msg.innerText = "The atmosphere is peaceful. How do you want to spend your time?";
+        addChoice("Pray & Recite (+15 Iman, -10 Energy)", () => { s.i += 15; s.e -= 10; next(); });
+        addChoice("Listen to a Talk (+10 Iman, -5 Energy)", () => { s.i += 10; s.e -= 5; next(); });
+    } else if (loc === "SCHOOL") {
+        msg.innerText = "Class is in session.";
+        addChoice("Study Hard (+10 Grades, -15 Energy)", () => { s.g += 10; s.e -= 15; next(); });
+        addChoice("Rest (+5 Energy)", () => { s.e += 5; next(); });
+    } else if (loc === "MARKET" && s.tIdx === 1) {
+        msg.innerText = "Time to work.";
+        addChoice("Work Hard (+$40, -30 Energy)", () => { s.m += 40; s.e -= 30; next(); });
+        addChoice("Light Duty (+$15, -10 Energy)", () => { s.m += 15; s.e -= 10; next(); });
+    } else {
+        msg.innerText = `At the ${loc}. What is your focus?`;
+        addChoice("General Activities (-15 Energy)", () => { s.e -= 15; next(); });
+        addChoice("Rest (+10 Energy)", () => { s.e += 10; next(); });
+    }
+}
+
+function addChoice(t, f) {
+    const b = document.createElement('button');
+    b.className = "game-btn";
+    b.innerText = t;
+    b.onclick = f;
+    document.getElementById('choices').appendChild(b);
+}
+
+function next() {
+    if (s.tIdx < 2) {
+        s.tIdx++; 
+        document.getElementById('dialogue-box').style.display = 'none';
+        document.getElementById('map-ui').style.display = 'flex';
+        updateUI();
+    } else {
+        document.getElementById('map-ui').style.display = 'none';
+        document.getElementById('dialogue-box').style.display = 'block';
+        document.getElementById('diag-msg').innerText = "Night has fallen. Set alarm for Suhoor?";
+        const ch = document.getElementById('choices');
+        ch.innerHTML = "";
+        addChoice("Suhoor Prep (+25 Energy morning)", () => { s.e += 25; endDay(); });
+        addChoice("Sleep in (+5 Energy morning)", () => { s.e += 5; endDay(); });
+    }
+}
+
+function endDay() {
+    s.tIdx = 0; s.day++; s.dIdx = (s.dIdx + 1) % 7;
+    if (s.e <= 0) { alert("Sarah fainted! Penalty applied."); s.e = 30; s.m -= 10; s.g -= 5; }
+    document.getElementById('dialogue-box').style.display = 'none';
+    document.getElementById('map-ui').style.display = 'flex';
+    updateUI();
+}
+
+updateUI();
+</script>
 </body>
 </html>
