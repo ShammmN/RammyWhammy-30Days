@@ -3,46 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ramadan Sarah: Full Experience</title>
+    <title>Ramadan Sarah: Friday Fest</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Poppins:wght@400;600&display=swap');
         :root { --gold: #f5c842; --bolt: #00f2ff; --green: #4caf50; --red: #ff4d4d; --pink: #fd79a8; }
         * { margin:0; padding:0; box-sizing:border-box; }
         body { background: #000; font-family: 'Poppins', sans-serif; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        
         #game-container { width: 1150px; height: 650px; background: #111; border: 3px solid var(--gold); position: relative; display: flex; flex-direction: column; }
-        
         #stat-bar { background: #000; display: flex; padding: 15px; border-bottom: 2px solid var(--gold); gap: 15px; }
         .stat-item { flex: 1; font-family: 'Oswald'; font-size: 0.8rem; color: #fff; text-transform: uppercase; }
         .bar-bg { width: 100%; height: 10px; background: #333; margin-top: 5px; border-radius: 5px; overflow: hidden; }
         .bar-fill { height: 100%; transition: 0.5s; width: 0%; }
-
         #view-area { flex-grow: 1; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        #scene-bg { position: absolute; inset: 0; background-size: cover; background-position: center; filter: brightness(0.3); z-index: 1; transition: 1s; }
-        
-        #game-ui { position: relative; z-index: 10; width: 550px; text-align: center; }
-        #status-text { font-family: 'Oswald'; font-size: 1.8rem; color: var(--gold); margin-bottom: 20px; text-shadow: 3px 3px #000; letter-spacing: 1px; }
-
+        #scene-bg { position: absolute; inset: 0; background-size: cover; background-position: center; filter: brightness(0.25); z-index: 1; transition: 1s; }
+        #game-ui { position: relative; z-index: 10; width: 600px; text-align: center; }
+        #status-text { font-family: 'Oswald'; font-size: 1.8rem; color: var(--gold); margin-bottom: 20px; text-shadow: 3px 3px #000; }
         .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .game-btn { background: rgba(0,0,0,0.9); color: #fff; border: 2px solid var(--gold); padding: 15px; font-family: 'Oswald'; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; transition: 0.2s; }
-        .game-btn:hover:not(.disabled) { background: var(--gold); color: #000; transform: scale(1.02); }
-        .game-btn.disabled { opacity: 0.1; cursor: not-allowed; pointer-events: none; filter: grayscale(1); }
+        .game-btn { background: rgba(0,0,0,0.9); color: #fff; border: 2px solid var(--gold); padding: 12px; font-family: 'Oswald'; cursor: pointer; text-transform: uppercase; font-size: 0.75rem; transition: 0.2s; line-height: 1.4; }
+        .game-btn:hover:not(.disabled) { background: var(--gold); color: #000; }
+        .game-btn.disabled { opacity: 0.1; cursor: not-allowed; pointer-events: none; }
         .full-btn { grid-column: span 2; }
-        .fav-btn { border-color: var(--bolt); color: var(--bolt); font-weight: bold; box-shadow: 0 0 10px rgba(0, 242, 255, 0.3); }
-
-        #dialogue-box { background: #fff; color: #000; padding: 30px; border: 4px solid var(--gold); border-radius: 2px; display: none; text-align: left; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        #diag-msg { font-weight: 600; font-size: 1.2rem; margin-bottom: 25px; color: #111; line-height: 1.5; }
-
+        .fav-btn { border-color: var(--bolt); color: var(--bolt); }
+        #dialogue-box { background: #fff; color: #000; padding: 30px; border: 4px solid var(--gold); border-radius: 2px; display: none; text-align: left; }
+        #diag-msg { font-weight: 600; font-size: 1.1rem; margin-bottom: 20px; color: #111; line-height: 1.5; }
         #game-over { position: absolute; inset: 0; background: rgba(0,0,0,0.98); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        #game-over h1 { font-family: 'Oswald'; font-size: 6rem; color: var(--red); }
+        #game-over h1 { font-family: 'Oswald'; font-size: 5rem; color: var(--red); }
     </style>
 </head>
 <body>
 
 <div id="game-over">
-    <h1 id="death-title">SARAH DIES</h1>
-    <p id="death-msg" style="color: #fff; margin-top: 15px; font-family: 'Oswald'; font-size: 2rem;"></p>
-    <button class="game-btn" style="width: 300px; margin-top: 40px;" onclick="location.reload()">RESTART JOURNEY</button>
+    <h1 id="death-title">GAME OVER</h1>
+    <p id="death-msg" style="color: #fff; margin-top: 15px; font-family: 'Oswald'; font-size: 1.5rem;"></p>
+    <button class="game-btn" style="width: 300px; margin-top: 40px;" onclick="location.reload()">RESTART</button>
 </div>
 
 <div id="game-container">
@@ -89,9 +82,9 @@ const week = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
 const times = ["MORNING", "AFTERNOON", "EVENING"];
 
 function updateUI() {
-    if (s.e <= 0) { triggerGameOver("SARAH COLLAPSED FROM EXHAUSTION."); return; }
+    if (s.e <= 0) { triggerGameOver("Sarah collapsed from exhaustion. Balance your health!"); return; }
+    if (s.g <= 0) { triggerGameOver("Sarah's grades hit zero. Academy expulsion."); return; }
     s.e = Math.min(100, s.e); s.i = Math.min(100, s.i); s.soc = Math.min(100, s.soc); s.g = Math.min(100, s.g);
-    
     document.getElementById('status-text').innerText = `DAY ${s.day} (${week[s.dIdx]}) - ${times[s.tIdx]}`;
     document.getElementById('e-bar').style.width = s.e + "%";
     document.getElementById('i-bar').style.width = s.i + "%";
@@ -99,7 +92,6 @@ function updateUI() {
     document.getElementById('g-bar').style.width = s.g + "%";
     document.getElementById('m-bar').style.width = Math.min(100, (s.m / 500) * 100) + "%";
     document.getElementById('m-val').innerText = Math.floor(s.m);
-    
     const isMorning = s.tIdx === 0; const isWeekday = s.dIdx < 5;
     ["HOME", "SCHOOL", "MOSQUE", "MARKET", "MALL"].forEach(l => {
         const b = document.getElementById(`btn-${l}`); b.classList.remove('disabled');
@@ -113,44 +105,39 @@ function goTo(loc) {
     document.getElementById('scene-bg').style.backgroundImage = `url('${imgs[loc]}')`;
     const msg = document.getElementById('diag-msg'); const ch = document.getElementById('choices'); ch.innerHTML = "";
 
-    if (s.day === 28 && loc === "HOME" && s.i >= 70) {
-        msg.innerText = "MOM: 'You've been so dedicated this Ramadan, Sarah. Here's a gift for your Eid outfit!' (+$80)";
-        s.m += 80; updateUI(); addChoice("Thank you Mom!", () => next()); return;
-    }
-
     if (loc === "SCHOOL") {
         if (week[s.dIdx] === "FRI" && s.tIdx === 0) {
-            msg.innerText = "FRIDAY TEST DAY. Maya is smirking. 'Let's see who's really the top student.'";
-            addChoice("Ace the Test (+25 Grades, -40 Energy)", () => { s.g += 25; s.e -= 40; next(); });
-            addChoice("Focus Hard (+12 Grades, -20 Energy)", () => { s.g += 12; s.e -= 20; next(); });
+            msg.innerText = "CRITICAL EXAM: Maya finished early. If you don't focus, you lose the scholarship.";
+            addChoice("ACE IT: +30 Grades | -50 Energy | -20 Social", () => { s.g += 30; s.e -= 50; s.soc -= 20; next(); });
+            addChoice("JUST PASS: +10 Grades | -15 Energy", () => { s.g += 10; s.e -= 15; next(); });
         } else {
-            msg.innerText = "Academy Classroom. Professor Ali is lecturing about the scholarship.";
-            addChoice("Intense Study (+10 Grades, -20 Energy)", () => { s.g += 10; s.e -= 20; next(); });
-            addChoice("Network with Friends (+12 Social, -10 Energy)", () => { s.soc += 12; s.e -= 10; next(); });
+            msg.innerText = "Academy Classroom. Professor Ali is watching.";
+            addChoice("FOCUS: +12 Grades | -20 Energy | -10 Social", () => { s.g += 12; s.e -= 20; s.soc -= 10; next(); });
+            addChoice("CHAT: +15 Social | -10 Energy | -12 Grades", () => { s.soc += 15; s.e -= 10; s.g -= 12; next(); });
         }
     } else if (loc === "HOME") {
-        msg.innerText = s.day === 29 ? "Eid is tomorrow! Final preparations." : "Home. A place to recharge.";
-        addChoice("Sleep (+35 Energy)", () => { s.e += 35; next(); });
-        addChoice("Review Notes (+15 Grades, -25 Energy)", () => { s.g += 15; s.e -= 25; next(); });
+        msg.innerText = "Home. Recharge or study?";
+        addChoice("HEAVY NAP: +45 Energy | -15 Grades", () => { s.e += 45; s.g -= 15; next(); });
+        addChoice("REVISION: +18 Grades | -35 Energy", () => { s.g += 18; s.e -= 35; next(); });
     } else if (loc === "MARKET") {
-        msg.innerText = "The Supermarket Shift. Those dollars add up.";
-        addChoice("Double Shift (+$70, -45 Energy)", () => { s.m += 70; s.e -= 45; next(); });
-        addChoice("Standard Shift (+$30, -20 Energy)", () => { s.m += 30; s.e -= 20; next(); });
+        msg.innerText = "Supermarket Shift. Time for money.";
+        addChoice("DOUBLE: +$90 | -55 Energy | -15 Iman | -10 Grades", () => { s.m += 90; s.e -= 55; s.i -= 15; s.g -= 10; next(); });
+        addChoice("LIGHT: +$40 | -25 Energy | -5 Iman", () => { s.m += 40; s.e -= 25; s.i -= 5; next(); });
     } else if (loc === "MALL") {
-        if (week[s.dIdx] === "SAT" && s.tIdx === 2) {
+        if (week[s.dIdx] === "FRI" && s.tIdx === 2) {
             document.getElementById('scene-bg').style.backgroundImage = `url('${imgs.FEST}')`;
-            msg.innerText = "⭐ SUHOORFEST ⭐ The whole school is here! Maya is showing off her high marks.";
-            addChoice("Ignore & Have Fun (+40 Social, -30 Energy, -$30)", () => { if(s.m >= 30){s.m -= 30; s.soc += 40; s.e -= 30; next();} else alert("Not enough cash!"); });
-            addChoice("Keep Studying at Cafe (+20 Grades, -30 Energy)", () => { s.g += 20; s.e -= 30; next(); });
+            msg.innerText = "⭐ SUHOORFEST! Everyone is celebrating post-exams. High cost, high social gain.";
+            addChoice("JOIN DINNER: +60 Social | -$50 | -40 Energy | -20 Grades", () => { if(s.m >= 50){s.m -= 50; s.soc += 60; s.e -= 40; s.g -= 20; next();} else alert("No money!"); });
+            addChoice("LEAVE: +10 Social | -10 Energy", () => { s.soc += 10; s.e -= 10; next(); });
         } else {
-            msg.innerText = "The Mall. You walk past the designer shop...";
-            addChoice("Buy Vitamins (-$30, +40 Energy)", () => { if(s.m >= 30){s.m -= 30; s.e += 40; next();} else alert("Broke!"); });
-            addChoice("Window Shop (+15 Social)", () => { s.soc += 15; next(); });
+            msg.innerText = "The Mall. Temptations everywhere.";
+            addChoice("VITAMINS: +50 Energy | -$40", () => { if(s.m >= 40){s.m -= 40; s.e += 50; next();} else alert("Broke!"); });
+            addChoice("BROWSE: +20 Social | -15 Energy | -10 Grades", () => { s.soc += 20; s.e -= 15; s.g -= 10; next(); });
         }
     } else if (loc === "MOSQUE") {
-        msg.innerText = "Peaceful prayer hall. Spiritual growth.";
-        addChoice("Long Prayer (+30 Iman, -15 Energy)", () => { s.i += 30; s.e -= 15; next(); });
-        addChoice("Iftar Volunteer (+15 Iman, +20 Social, -25 Energy)", () => { s.i += 15; s.soc += 20; s.e -= 25; next(); });
+        msg.innerText = "Mosque. Peace comes at the cost of time.";
+        addChoice("TARAWIH: +40 Iman | -30 Energy | -20 Social | -10 Grades", () => { s.i += 40; s.e -= 30; s.soc -= 20; s.g -= 10; next(); });
+        addChoice("DUA: +10 Iman | -5 Energy", () => { s.i += 10; s.e -= 5; next(); });
     }
 }
 
@@ -164,14 +151,14 @@ function next() {
     updateUI();
     if (s.tIdx === 1) { 
         document.getElementById('map-ui').style.display = 'none'; document.getElementById('dialogue-box').style.display = 'block';
-        document.getElementById('diag-msg').innerText = "IFTAR: The sun sets. Time to nourish."; const ch = document.getElementById('choices'); ch.innerHTML = "";
-        addChoice("Full Feast (-$25, +60 Energy)", () => { if(s.m >= 25){s.m -= 25; s.e += 60; s.tIdx++; updateUI(); resetMap();} else alert("No money!"); });
-        addChoice("Dates & Water (+20 Energy)", () => { s.e += 20; s.tIdx++; updateUI(); resetMap(); });
+        document.getElementById('diag-msg').innerText = "IFTAR: The fast breaks."; const ch = document.getElementById('choices'); ch.innerHTML = "";
+        addChoice("ORGANIC: +65 Energy | -$30", () => { if(s.m >= 30){s.m -= 30; s.e += 65; s.tIdx++; updateUI(); resetMap();} else alert("No money!"); });
+        addChoice("STREET FOOD: +35 Energy | -$10 | -15 Grades", () => { if(s.m >= 10){s.m -= 10; s.e += 35; s.g -= 15; s.tIdx++; updateUI(); resetMap();} else alert("No money!"); });
     } else if (s.tIdx === 2) { 
         document.getElementById('map-ui').style.display = 'none'; document.getElementById('dialogue-box').style.display = 'block';
-        document.getElementById('diag-msg').innerText = "MIDNIGHT: Suhoor approaches."; const ch = document.getElementById('choices'); ch.innerHTML = "";
-        addChoice("Hearty Suhoor (+45 Energy)", () => { s.e += 45; endDay(); });
-        addChoice("Sleep through it (+15 Energy)", () => { s.e += 15; endDay(); });
+        document.getElementById('diag-msg').innerText = "SUHOOR: Preparing for tomorrow."; const ch = document.getElementById('choices'); ch.innerHTML = "";
+        addChoice("FULL PREP: +55 Energy | -20 Social", () => { s.e += 55; s.soc -= 20; endDay(); });
+        addChoice("SKIP: +15 Energy | -25 Iman", () => { s.e += 15; s.i -= 25; endDay(); });
     } else { s.tIdx++; resetMap(); updateUI(); }
 }
 
@@ -186,23 +173,22 @@ function startShopping() {
     document.getElementById('map-ui').style.display = 'none'; document.getElementById('dialogue-box').style.display = 'block';
     document.getElementById('scene-bg').style.backgroundImage = `url('${imgs.MALL}')`;
     const msg = document.getElementById('diag-msg'); const ch = document.getElementById('choices'); ch.innerHTML = "";
-    msg.innerText = `EID EVE: You have $${Math.floor(s.m)}. Final choice for the party!`;
-    addChoice("Casual Outfit (-$60)", () => { s.m -= 60; finalReveal(); });
-    addChoice("Elegant Ensemble (-$160, +40 Social)", () => { if(s.m >= 160){s.m -= 160; s.soc += 40; finalReveal();} else alert("Not enough!"); });
-    addChoice("⭐ THE DESIGNER ABAYA ⭐ (-$350, +120 Social)", () => { if(s.m >= 350){s.m -= 350; s.soc += 120; s.designer = true; finalReveal();} else alert("You didn't save enough at the market!"); }, true);
+    msg.innerText = `EID SHOPPING: Total: $${Math.floor(s.m)}.`;
+    addChoice("BASIC: -$50 | +10 Social", () => { s.m -= 50; s.soc += 10; finalReveal(); });
+    addChoice("DESIGNER: -$350 | +150 Social", () => { if(s.m >= 350){s.m -= 350; s.soc += 150; s.designer = true; finalReveal();} else alert("Savings too low!"); }, true);
 }
 
 function finalReveal() {
     const msg = document.getElementById('diag-msg'); const ch = document.getElementById('choices'); ch.innerHTML = "";
     if (s.g >= 85 && s.i >= 80) {
         document.getElementById('scene-bg').style.backgroundImage = `url('${imgs.EID}')`;
-        let txt = "🏆 EID MUBARAK! Professor Ali steps forward: 'The scholarship award for excellence goes to... SARAH!' Maya is speechless. ";
-        if (s.designer) txt += "'And Sarah, that Abaya is truly breathtaking!' the Professor adds.";
-        msg.innerText = txt + " You celebrate with your family and friends. A perfect end.";
-        addChoice("NEW JOURNEY", () => location.reload());
+        let txt = "🏆 EID VICTORY: Professor Ali awards Sarah the scholarship! Maya is stunned. ";
+        if (s.designer) txt += "Your Abaya makes you the most elegant student in the room!";
+        msg.innerText = txt + " Your discipline paid off.";
+        addChoice("PLAY AGAIN", () => location.reload());
     } else {
-        msg.innerText = "EID MUBARAK. The party was fun, but Maya won the scholarship by a few points. Next year, keep those Grades and Iman higher!";
-        addChoice("RETRY RAMADAN", () => location.reload());
+        msg.innerText = "EID: Maya won the scholarship. Your grades or focus were too low. The consequences of your month were clear.";
+        addChoice("RETRY", () => location.reload());
     }
 }
 
@@ -211,3 +197,4 @@ updateUI();
 </script>
 </body>
 </html>
+
