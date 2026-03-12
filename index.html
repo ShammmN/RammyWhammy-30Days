@@ -3,42 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ramadan Sarah</title>
+    <title>Ramadan Sarah: Final Edition</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Poppins:wght@400;600&display=swap');
         :root { --gold: #f5c842; --bolt: #00f2ff; --green: #4caf50; --red: #ff4d4d; --pink: #fd79a8; }
         * { margin:0; padding:0; box-sizing:border-box; }
         body { background: #000; font-family: 'Poppins', sans-serif; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        
         #game-container { width: 1150px; height: 650px; background: #111; border: 3px solid var(--gold); position: relative; display: flex; }
-        
-        /* Side Panel - Now just for flavor/status */
         #rules-sidebar { width: 250px; background: #000; border-right: 2px solid var(--gold); padding: 20px; z-index: 20; }
         #rules-sidebar h2 { font-family: 'Oswald'; color: var(--gold); font-size: 1.5rem; margin-bottom: 20px; }
         .story-hint { color: #888; font-style: italic; font-size: 0.9rem; line-height: 1.6; }
-
         #main-game { flex-grow: 1; display: flex; flex-direction: column; position: relative; }
-        
         #stat-bar { background: #000; display: flex; padding: 10px; border-bottom: 2px solid var(--gold); gap: 10px; }
         .stat-item { flex: 1; font-family: 'Oswald'; font-size: 0.7rem; color: #fff; }
-        .bar-bg { width: 100%; height: 8px; background: #333; margin-top: 4px; border-radius: 4px; }
-        .bar-fill { height: 100%; transition: 0.5s; }
-
+        .bar-bg { width: 100%; height: 8px; background: #333; margin-top: 4px; border-radius: 4px; overflow: hidden; }
+        .bar-fill { height: 100%; transition: 0.5s; width: 0%; }
         #view-area { flex-grow: 1; position: relative; display: flex; align-items: center; justify-content: center; }
-        #scene-bg { position: absolute; inset: 0; background-size: cover; background-position: center; filter: brightness(0.2); z-index: 1; transition: 0.8s; }
-        
+        #scene-bg { position: absolute; inset: 0; background-size: cover; background-position: center; filter: brightness(0.25); z-index: 1; transition: 0.8s; }
         #game-ui { position: relative; z-index: 10; width: 450px; text-align: center; }
         #status-text { font-family: 'Oswald'; font-size: 1.3rem; color: var(--gold); margin-bottom: 15px; text-shadow: 2px 2px #000; }
-
         .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .game-btn { background: rgba(0,0,0,0.9); color: #fff; border: 2px solid var(--gold); padding: 12px; font-family: 'Oswald'; cursor: pointer; text-transform: uppercase; font-size: 0.85rem; }
         .game-btn:hover:not(.disabled) { background: var(--gold); color: #000; }
-        .game-btn.disabled { opacity: 0.1; cursor: default; }
+        .game-btn.disabled { opacity: 0.15; cursor: not-allowed; pointer-events: none; }
         .full-btn { grid-column: span 2; }
-
+        .fav-btn { border-color: var(--bolt); color: var(--bolt); font-weight: bold; }
         #dialogue-box { background: #fff; color: #000; padding: 25px; border: 4px solid var(--gold); border-radius: 4px; display: none; text-align: left; }
         #diag-msg { font-weight: 600; font-size: 1.1rem; margin-bottom: 20px; color: #111; line-height: 1.4; }
-
         #game-over { position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         #game-over h1 { font-family: 'Oswald'; font-size: 5rem; color: var(--red); }
     </style>
@@ -46,30 +37,28 @@
 <body>
 
 <div id="game-over">
-    <h1 id="death-title">GAME OVER</h1>
+    <h1 id="death-title">SARAH DIES</h1>
     <p id="death-msg" style="color: #fff; margin-top: 10px; font-family: 'Oswald'; font-size: 1.5rem;"></p>
-    <button class="game-btn" style="width: 250px; margin-top: 30px;" onclick="location.reload()">RESTART JOURNEY</button>
+    <button class="game-btn" style="width: 250px; margin-top: 30px;" onclick="location.reload()">RETRY</button>
 </div>
 
 <div id="game-container">
     <div id="rules-sidebar">
-        <h2>SARAH'S PATH</h2>
-        <p class="story-hint">"Thirty days to prove I belong at the Academy... thirty days to find balance."</p>
+        <h2>JOURNAL</h2>
+        <p id="hint-text" class="story-hint"></p>
     </div>
-
     <div id="main-game">
         <div id="stat-bar">
             <div class="stat-item">ENERGY <div class="bar-bg"><div id="e-bar" class="bar-fill" style="background:var(--bolt)"></div></div></div>
             <div class="stat-item">IMAN <div class="bar-bg"><div id="i-bar" class="bar-fill" style="background:var(--gold)"></div></div></div>
             <div class="stat-item">SOCIAL <div class="bar-bg"><div id="s-bar" class="bar-fill" style="background:var(--pink)"></div></div></div>
             <div class="stat-item">GRADES <div class="bar-bg"><div id="g-bar" class="bar-fill" style="background:#fff"></div></div></div>
-            <div class="stat-item">SAVINGS <div class="bar-bg"><div id="m-bar" class="bar-fill" style="background:var(--green)"></div></div></div>
+            <div class="stat-item">SAVINGS ($<span id="m-val">100</span>) <div class="bar-bg"><div id="m-bar" class="bar-fill" style="background:var(--green)"></div></div></div>
         </div>
-
         <div id="view-area">
             <div id="scene-bg"></div>
             <div id="game-ui">
-                <div id="status-text">DAY 01 (MON) - MORNING</div>
+                <div id="status-text"></div>
                 <div id="map-ui" class="btn-grid">
                     <button class="game-btn" id="btn-HOME" onclick="goTo('HOME')">HOUSE</button>
                     <button class="game-btn" id="btn-SCHOOL" onclick="goTo('SCHOOL')">ACADEMY</button>
@@ -92,146 +81,128 @@ const imgs = {
     SCHOOL: "https://i.pinimg.com/1200x/0b/91/f2/0b91f2f4370cf26f23e44efe7136195c.jpg",
     MOSQUE: "https://i.pinimg.com/736x/10/23/db/1023dbabf8efd1d838455991909ec75c.jpg",
     MARKET: "https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1000",
-    MALL: "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?q=80&w=1000"
+    MALL: "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?q=80&w=1000",
+    FEST: "https://images.unsplash.com/photo-1519222970733-f546218fa6d7?q=80&w=1000",
+    EID: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=1000"
 };
 
-let s = { day: 1, dIdx: 0, tIdx: 0, e: 85, i: 50, soc: 50, g: 60, m: 100 };
+let s = { day: 1, dIdx: 0, tIdx: 0, e: 85, i: 50, soc: 50, g: 60, m: 100, hasDesigner: false };
 const week = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
 const times = ["MORNING", "AFTERNOON", "EVENING"];
 
-function triggerGameOver(msg) {
-    document.getElementById('death-msg').innerText = msg;
-    document.getElementById('game-over').style.display = 'flex';
-}
-
 function updateUI() {
     if (s.e <= 0) { triggerGameOver("SARAH COLLAPSED FROM EXHAUSTION."); return; }
-    
-    s.e = Math.min(100, Math.max(0, s.e));
-    s.i = Math.min(100, Math.max(0, s.i));
-    s.soc = Math.min(100, Math.max(0, s.soc));
-    s.g = Math.min(100, Math.max(0, s.g));
-
+    s.e = Math.min(100, s.e); s.i = Math.min(100, s.i); s.soc = Math.min(100, s.soc); s.g = Math.min(100, s.g);
     document.getElementById('status-text').innerText = `DAY ${s.day} (${week[s.dIdx]}) - ${times[s.tIdx]}`;
     document.getElementById('e-bar').style.width = s.e + "%";
     document.getElementById('i-bar').style.width = s.i + "%";
     document.getElementById('s-bar').style.width = s.soc + "%";
     document.getElementById('g-bar').style.width = s.g + "%";
-    document.getElementById('m-bar').style.width = Math.min(100, (s.m/3)) + "%";
-
-    const isAM = s.tIdx === 0;
+    document.getElementById('m-bar').style.width = Math.min(100, (s.m / 500) * 100) + "%";
+    document.getElementById('m-val').innerText = Math.floor(s.m);
+    
+    const isMorning = s.tIdx === 0; const isWeekday = s.dIdx < 5;
     ["HOME", "SCHOOL", "MOSQUE", "MARKET", "MALL"].forEach(l => {
-        const b = document.getElementById(`btn-${l}`);
-        if (b) {
-            b.classList.remove('disabled');
-            if (s.dIdx < 5 && isAM && l !== "SCHOOL") b.classList.add('disabled');
-        }
+        const b = document.getElementById(`btn-${l}`); b.classList.remove('disabled');
+        if (isMorning && isWeekday && l !== "SCHOOL") b.classList.add('disabled');
     });
+    document.getElementById('hint-text').innerText = (isMorning && isWeekday) ? "Class is in session! No skipping allowed." : "Free time! Balance your life Sarah.";
 }
 
 function goTo(loc) {
     document.getElementById('map-ui').style.display = 'none';
     document.getElementById('dialogue-box').style.display = 'block';
     document.getElementById('scene-bg').style.backgroundImage = `url('${imgs[loc]}')`;
-    
-    const msg = document.getElementById('diag-msg');
-    const ch = document.getElementById('choices');
-    ch.innerHTML = "";
+    const msg = document.getElementById('diag-msg'); const ch = document.getElementById('choices'); ch.innerHTML = "";
 
-    if (loc === "HOME") {
-        if (s.tIdx === 2) {
-            msg.innerText = "The night is still. You have that scholarship essay to finish.";
-            addChoice("Study Hard (+15 Grades, -25 Energy)", () => { s.g += 15; s.e -= 25; next(); });
-            addChoice("Relax (+15 Energy, +5 Social)", () => { s.e += 15; s.soc += 5; next(); });
-        } else {
-            msg.innerText = "Home sweet home. Time to recharge?";
-            addChoice("Power Nap (+20 Energy)", () => { s.e += 20; next(); });
-            addChoice("Organize Notes (+5 Grades, -5 Energy)", () => { s.g += 5; s.e -= 5; next(); });
-        }
+    if (s.day === 28 && loc === "HOME" && s.i >= 70) {
+        msg.innerText = "MOM: 'You've been so dedicated. Here's a gift for Eid!' (+$80)";
+        s.m += 80; updateUI(); addChoice("Thank you Mom!", () => next()); return;
+    }
+
+    if (loc === "SCHOOL") {
+        msg.innerText = "The Academy. Maya is working on her project nearby.";
+        addChoice("Study (+12 Grades, -20 Energy)", () => { s.g += 12; s.e -= 20; next(); });
+        addChoice("Chat with Friends (+15 Social, -10 Energy)", () => { s.soc += 15; s.e -= 10; next(); });
+    } else if (loc === "HOME") {
+        msg.innerText = s.day === 29 ? "EID PREP! Help out or one last study session?" : "Home sweet home.";
+        addChoice("Rest (+30 Energy)", () => { s.e += 30; next(); });
+        addChoice("Study (+15 Grades, -25 Energy)", () => { s.g += 15; s.e -= 25; next(); });
     } else if (loc === "MARKET") {
-        msg.innerText = "Supermarket floors. Every shift counts for the savings goal.";
-        addChoice("Double Shift (+$50, -40 Energy)", () => { s.m += 50; s.e -= 40; next(); });
-        addChoice("Standard Shift (+$20, -15 Energy)", () => { s.m += 20; s.e -= 15; next(); });
+        msg.innerText = "Work shift. Earn that money!";
+        addChoice("Full Shift (+$75, -45 Energy)", () => { s.m += 75; s.e -= 45; next(); });
+        addChoice("Short Shift (+$35, -20 Energy)", () => { s.m += 35; s.e -= 20; next(); });
     } else if (loc === "MALL") {
-        msg.innerText = "Bright lights and crowds. What are you looking for?";
-        addChoice("Buy Vitamins (-$30, +35 Energy)", () => { if(s.m >= 30){s.m -= 30; s.e += 35; next();} else alert("Not enough money!"); });
-        addChoice("Meet Friends (+25 Social, -15 Energy)", () => { s.soc += 25; s.e -= 15; next(); });
-    } else if (loc === "SCHOOL") {
-        if (s.dIdx === 4) {
-            msg.innerText = "The Academy's weekly assessment. Maya is looking confident. Don't let your grades slip below 50.";
-            addChoice("Give it Everything (+25 Grades, -45 Energy)", () => { s.g += 25; s.e -= 45; if (s.g < 50) triggerGameOver("GRADES TOO LOW. DISMISSED FROM ACADEMY."); else next(); });
-            addChoice("Focus on Basics (+10 Grades, -15 Energy)", () => { s.g += 10; s.e -= 15; if (s.g < 50) triggerGameOver("GRADES TOO LOW. DISMISSED FROM ACADEMY."); else next(); });
+        if (week[s.dIdx] === "SAT" && s.tIdx === 2) {
+            document.getElementById('scene-bg').style.backgroundImage = `url('${imgs.FEST}')`;
+            msg.innerText = "⭐ SUHOORFEST ⭐ The mall is buzzing! Friends are everywhere.";
+            addChoice("Party with Friends (+40 Social, -30 Energy, -$30)", () => { if(s.m >= 30){s.m -= 30; s.soc += 40; s.e -= 30; next();} else alert("Not enough money!"); });
+            addChoice("Study in Cafe (+20 Grades, -30 Energy)", () => { s.g += 20; s.e -= 30; next(); });
         } else {
-            msg.innerText = "Advanced Theory lectures. Your head is spinning.";
-            addChoice("Take Detailed Notes (+10 Grades, -20 Energy)", () => { s.g += 10; s.e -= 20; next(); });
-            addChoice("Discuss with Peers (+15 Social, -10 Energy)", () => { s.soc += 15; s.e -= 10; next(); });
+            msg.innerText = "The Mall. You see the Designer Abaya in the window.";
+            addChoice("Buy Supplies (-$20, +25 Energy)", () => { if(s.m >= 20){s.m -= 20; s.e += 25; next();} else alert("Broke!"); });
+            addChoice("Hang out (+20 Social, -10 Energy)", () => { s.soc += 20; s.e -= 10; next(); });
         }
     } else if (loc === "MOSQUE") {
-        if (s.tIdx === 2) {
-            msg.innerText = "Tarawih prayers are starting. It will be a long night, but worth it.";
-            addChoice("Attend Tarawih (+35 Iman, +20 Social, -40 Energy)", () => { s.i += 35; s.soc += 20; s.e -= 40; next(); });
-            addChoice("Short Prayer (+15 Iman, -10 Energy)", () => { s.i += 15; s.e -= 10; next(); });
-        } else {
-            msg.innerText = "Quiet and peaceful. The world feels far away.";
-            addChoice("Recite (+20 Iman, -10 Energy)", () => { s.i += 20; s.e -= 10; next(); });
-            addChoice("Find Peace (+15 Energy)", () => { s.e += 15; next(); });
-        }
+        msg.innerText = "Quiet prayer time.";
+        addChoice("Pray (+25 Iman, -10 Energy)", () => { s.i += 25; s.e -= 10; next(); });
+        addChoice("Community Meal (+15 Iman, +15 Social, -10 Energy)", () => { s.i += 15; s.soc += 15; s.e -= 10; next(); });
     }
 }
 
-function addChoice(t, f) {
+function addChoice(t, f, fav = false) {
     const b = document.createElement('button');
-    b.className = "game-btn full-btn";
-    b.innerText = t;
-    b.onclick = f;
+    b.className = "game-btn full-btn" + (fav ? " fav-btn" : ""); b.innerText = t; b.onclick = f;
     document.getElementById('choices').appendChild(b);
 }
 
 function next() {
     updateUI();
     if (s.tIdx === 1) { 
-        document.getElementById('map-ui').style.display = 'none';
-        document.getElementById('dialogue-box').style.display = 'block';
-        document.getElementById('diag-msg').innerText = "MAGHRIB: The sun has set.";
-        const ch = document.getElementById('choices');
-        ch.innerHTML = "";
-        addChoice("Healthy Balanced Meal (-$25, +55 Energy)", () => { 
-            if(s.m >= 25) { s.m -= 25; s.e += 55; s.tIdx++; updateUI(); resetMap(); } 
-            else alert("Too broke! You have to settle for a quick snack."); 
-        });
-        addChoice("Quick Date & Water (+15 Energy)", () => { s.e += 15; s.tIdx++; updateUI(); resetMap(); });
+        document.getElementById('map-ui').style.display = 'none'; document.getElementById('dialogue-box').style.display = 'block';
+        document.getElementById('diag-msg').innerText = "IFTAR: Time to break the fast."; const ch = document.getElementById('choices'); ch.innerHTML = "";
+        addChoice("Full Iftar (-$25, +60 Energy)", () => { if(s.m >= 25){s.m -= 25; s.e += 60; s.tIdx++; updateUI(); resetMap();} else alert("No money!"); });
+        addChoice("Light Snack (+20 Energy)", () => { s.e += 20; s.tIdx++; updateUI(); resetMap(); });
     } else if (s.tIdx === 2) { 
-        document.getElementById('map-ui').style.display = 'none';
-        document.getElementById('dialogue-box').style.display = 'block';
-        document.getElementById('diag-msg').innerText = "MIDNIGHT: Tomorrow is a new day.";
-        const ch = document.getElementById('choices');
-        ch.innerHTML = "";
-        addChoice("Complete Suhoor (+35 Energy)", () => { s.e += 35; endDay(); });
-        addChoice("Sleep Immediately (+10 Energy)", () => { s.e += 10; endDay(); });
-    } else {
-        s.tIdx++; 
-        resetMap();
-        updateUI();
-    }
+        document.getElementById('map-ui').style.display = 'none'; document.getElementById('dialogue-box').style.display = 'block';
+        document.getElementById('diag-msg').innerText = "NIGHT: Suhoor preparations."; const ch = document.getElementById('choices'); ch.innerHTML = "";
+        addChoice("Prep & Eat (+40 Energy)", () => { s.e += 40; endDay(); });
+        addChoice("Just Sleep (+15 Energy)", () => { s.e += 15; endDay(); });
+    } else { s.tIdx++; resetMap(); updateUI(); }
 }
 
-function resetMap() {
-    document.getElementById('dialogue-box').style.display = 'none';
-    document.getElementById('map-ui').style.display = 'grid';
-}
+function resetMap() { document.getElementById('dialogue-box').style.display = 'none'; document.getElementById('map-ui').style.display = 'grid'; }
 
 function endDay() {
-    if (s.day >= 30) {
-        if (s.g >= 85 && s.i >= 80) alert("SUCCESS: You earned the scholarship! Eid Mubarak!");
-        else alert("SURVIVAL: You finished the month, but Maya took the scholarship seat.");
-        location.reload();
-        return;
-    }
-    s.tIdx = 0; s.day++; s.dIdx = (s.dIdx + 1) % 7;
-    resetMap();
-    updateUI();
+    if (s.day >= 30) { startShopping(); return; }
+    s.tIdx = 0; s.day++; s.dIdx = (s.dIdx + 1) % 7; resetMap(); updateUI();
 }
 
+function startShopping() {
+    document.getElementById('map-ui').style.display = 'none'; document.getElementById('dialogue-box').style.display = 'block';
+    document.getElementById('scene-bg').style.backgroundImage = `url('${imgs.MALL}')`;
+    const msg = document.getElementById('diag-msg'); const ch = document.getElementById('choices'); ch.innerHTML = "";
+    msg.innerText = `EID EVE SHOPPING: You have $${Math.floor(s.m)}. Pick your outfit!`;
+    addChoice("Simple Outfit (-$60)", () => { s.m -= 60; finalReveal(); });
+    addChoice("Fancy Dress (-$160)", () => { if(s.m >= 160){s.m -= 160; s.soc += 40; finalReveal();} else alert("Not enough!"); });
+    addChoice("⭐ THE DESIGNER ABAYA ⭐ (-$350)", () => { if(s.m >= 350){s.m -= 350; s.soc += 100; s.hasDesigner = true; finalReveal();} else alert("You didn't save enough!"); }, true);
+}
+
+function finalReveal() {
+    const msg = document.getElementById('diag-msg'); const ch = document.getElementById('choices'); ch.innerHTML = "";
+    if (s.g >= 85 && s.i >= 80) {
+        document.getElementById('scene-bg').style.backgroundImage = `url('${imgs.EID}')`;
+        let txt = "🏆 EID MUBARAK! Professor Ali announces: 'The scholarship goes to SARAH!' Maya is shocked. ";
+        if (s.hasDesigner) txt += "Prof adds: 'And what a stunning choice of Abaya, Sarah!'";
+        msg.innerText = txt + " Your friends and family are cheering. You did it!";
+        addChoice("VICTORY! REPLAY?", () => location.reload());
+    } else {
+        msg.innerText = "EID MUBARAK. You survived the month, but Maya's grades were higher. You'll get it next year!";
+        addChoice("TRY AGAIN?", () => location.reload());
+    }
+}
+
+function triggerGameOver(m) { document.getElementById('death-msg').innerText = m; document.getElementById('game-over').style.display = 'flex'; }
 updateUI();
 </script>
 </body>
